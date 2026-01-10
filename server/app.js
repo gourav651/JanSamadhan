@@ -15,7 +15,7 @@ app.use(
   })
 );
 
-// 🔥 REQUIRED for multer text fields
+// 🔥REQUIRED for multer text fields
 app.use(express.urlencoded({ extended: true }));
 
 // JSON for non-multipart routes
