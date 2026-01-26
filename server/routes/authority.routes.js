@@ -5,7 +5,9 @@ import upload from "../middlewares/upload.js";
 
 import {
   getAssignedIssues,
+  getAuthorityDashboardStats,
   getIssueForAuthority,
+  getRecentAssignedIssues,
   updateStatus,
 } from "../controllers/authority.controller.js";
 
@@ -17,6 +19,8 @@ router.use(requireRole(["AUTHORITY"]));
 
 // 📋 Assigned issues list
 router.get("/issues/assigned", getAssignedIssues);
+router.get("/dashboard/stats", getAuthorityDashboardStats);
+router.get("/issues/recent", getRecentAssignedIssues);
 
 // 🔄 Update issue status + resolution proof
 router.patch(

@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
+import axios from "axios";
 
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 
@@ -33,6 +35,40 @@ const stats = [
 
 const AuthDashboard = () => {
   const navigate = useNavigate();
+  const { getToken } = useAuth();
+  const [stats, setStats] = useState(null);
+  const [recentIssues, setRecentIssues] = useState([]);
+
+  const [recentPage, setRecentPage] = useState(1);
+  const [recentTotalPages, setRecentTotalPages] = useState(1);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = await getToken();
+
+        const [statsRes, recentRes] = await Promise.all([
+          axios.get("http://localhost:5000/api/authority/dashboard/stats", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get("http://localhost:5000/api/authority/issues/recent", {
+            headers: { Authorization: `Bearer ${token}` },
+            params: {
+              page: recentPage,
+              limit: 5,
+            },
+          }),
+        ]);
+
+        setStats(statsRes.data.data);
+        setRecentIssues(recentRes.data.issues);
+      } catch (error) {
+        console.error("Failed to load dashboard data", error);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
     <AuthorityLayout>
@@ -50,42 +86,7 @@ const AuthDashboard = () => {
             </div>
 
             {/* FILTER BAR (UI only) */}
-            <div className="flex gap-3 flex-wrap">
-              <button className="flex items-center gap-2 h-10 px-4 rounded-lg bg-gray-100 border hover:border-primary">
-                <span className="material-symbols-outlined text-gray-500">
-                  category
-                </span>
-                <span className="text-sm font-medium">Category: All</span>
-                <span className="material-symbols-outlined text-gray-400">
-                  expand_more
-                </span>
-              </button>
-
-              <button className="flex items-center gap-2 h-10 px-4 rounded-lg bg-gray-100 border hover:border-primary">
-                <span className="material-symbols-outlined text-gray-500">
-                  info
-                </span>
-                <span className="text-sm font-medium">Status: All</span>
-                <span className="material-symbols-outlined text-gray-400">
-                  expand_more
-                </span>
-              </button>
-
-              <button className="flex items-center gap-2 h-10 px-4 rounded-lg bg-gray-100 border hover:border-primary">
-                <span className="material-symbols-outlined text-gray-500">
-                  calendar_today
-                </span>
-                <span className="text-sm font-medium">Last 30 Days</span>
-                <span className="material-symbols-outlined text-gray-400">
-                  expand_more
-                </span>
-              </button>
-
-              <button className="flex items-center gap-2 h-10 px-4 rounded-lg bg-primary text-white font-bold">
-                <span className="material-symbols-outlined">filter_list</span>
-                Filter Results
-              </button>
-            </div>
+            
           </div>
         </header>
 
@@ -93,27 +94,10 @@ const AuthDashboard = () => {
         <div className="p-8 flex flex-col gap-8">
           {/* STATS */}
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard
-              title="Total Open Issues"
-              value="124"
-              icon="error"
-              color="red"
-              footer="+12% from last week"
-            />
-            <StatCard
-              title="In Progress"
-              value="45"
-              icon="pending"
-              color="amber"
-              footer="8 tickets added today"
-            />
-            <StatCard
-              title="Resolved"
-              value="892"
-              icon="check_circle"
-              color="emerald"
-              footer="98% success rate"
-            />
+            <StatCard title="Open Issues" value={stats?.open || 0} />
+            <StatCard title="In Progress" value={stats?.inProgress || 0} />
+            <StatCard title="Resolved" value={stats?.resolved || 0} />
+
             <div
               onClick={() => navigate("/authority/assigned-issues")}
               className="bg-primary rounded-xl p-6 cursor-pointer hover:opacity-95 transition"
@@ -126,8 +110,15 @@ const AuthDashboard = () => {
                   person
                 </span>
               </div>
-              <p className="text-3xl font-black mt-2">12</p>
-              <p className="text-xs mt-1">3 high priority tasks</p>
+
+              {/* ✅ REAL DATA */}
+              <p className="text-3xl font-black mt-2">
+                {stats?.totalAssigned ?? 0}
+              </p>
+
+              <p className="text-xs mt-1">
+                {stats?.inProgress ?? 0} in progress
+              </p>
             </div>
           </section>
 
@@ -135,7 +126,10 @@ const AuthDashboard = () => {
           <section className="bg-white border rounded-xl shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b flex justify-between items-center">
               <h3 className="text-lg font-bold">Recent Issues</h3>
-              <button className="text-primary text-sm font-bold">
+              <button
+                onClick={() => navigate("/authority/assigned-issues")}
+                className="text-primary text-sm font-bold"
+              >
                 View All Issues
               </button>
             </div>
@@ -153,33 +147,38 @@ const AuthDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  <RecentRow
-                    title="Main Water Pipe Burst"
-                    id="JS-9201"
-                    category="Water Supply"
-                    status="In Progress"
-                    statusColor="amber"
-                    date="Oct 24, 2023"
-                    location="Sector 12, Main Road"
-                  />
-                  <RecentRow
-                    title="Street Light Malfunction"
-                    id="JS-8842"
-                    category="Electricity"
-                    status="Assigned"
-                    statusColor="blue"
-                    date="Oct 23, 2023"
-                    location="Park View Apartments"
-                  />
-                  <RecentRow
-                    title="Pothole Repair Needed"
-                    id="JS-9128"
-                    category="Road Maintenance"
-                    status="Resolved"
-                    statusColor="emerald"
-                    date="Oct 22, 2023"
-                    location="Near Gandhi Square"
-                  />
+                  {recentIssues.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="px-6 py-6 text-center text-gray-500"
+                      >
+                        No recent assigned issues
+                      </td>
+                    </tr>
+                  ) : (
+                    recentIssues.map((issue) => (
+                      <RecentRow
+                        key={issue._id}
+                        title={issue.title}
+                        id={issue._id.slice(-6)}
+                        category={issue.category}
+                        status={issue.status.replace("_", " ")}
+                        statusColor={
+                          issue.status === "RESOLVED"
+                            ? "emerald"
+                            : issue.status === "IN_PROGRESS"
+                              ? "amber"
+                              : "blue"
+                        }
+                        date={new Date(issue.createdAt).toLocaleDateString()}
+                        location={issue.location?.address || "—"}
+                        onClick={() =>
+                          navigate(`/authority/issues/${issue._id}`)
+                        }
+                      />
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -223,8 +222,9 @@ const RecentRow = ({
   statusColor,
   date,
   location,
+  onClick,
 }) => (
-  <tr className="hover:bg-gray-50 transition">
+  <tr onClick={onClick} className="hover:bg-gray-50 transition cursor-pointer">
     <td className="px-6 py-4">
       <p className="font-bold">{title}</p>
       <p className="text-xs text-gray-400">ID: #{id}</p>
@@ -241,7 +241,7 @@ const RecentRow = ({
     <td className="px-6 py-4 text-sm text-gray-500">{location}</td>
     <td className="px-6 py-4 text-right">
       <span className="material-symbols-outlined text-gray-400 cursor-pointer">
-        chevron_right
+        chevron_right_arrow
       </span>
     </td>
   </tr>

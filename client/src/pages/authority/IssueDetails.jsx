@@ -31,7 +31,7 @@ const AuthIssueDetails = () => {
         const token = await getToken();
         const res = await axios.get(
           `http://localhost:5000/api/authority/issues/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
 
         setIssue(res.data.issue);
@@ -72,7 +72,7 @@ const AuthIssueDetails = () => {
       await axios.patch(
         `http://localhost:5000/api/authority/issues/${id}/status`,
         formData,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       setIssue((prev) => ({
@@ -115,6 +115,9 @@ const AuthIssueDetails = () => {
     status === issue?.status &&
     notes === (issue?.resolutionNotes || "") &&
     files.length === 0;
+
+  const disabledOverlay =
+    "relative cursor-not-allowed after:absolute after:inset-0 after:flex after:items-center after:justify-center after:opacity-0 hover:after:opacity-100 after:text-2xl after:text-red-500 after:bg-white/70";
 
   return (
     <AuthorityLayout>
@@ -240,10 +243,7 @@ const AuthIssueDetails = () => {
               <h3 className="text-xl font-bold">Authority Actions Panel</h3>
 
               {/* STATUS */}
-              <div>
-                <label className="block font-semibold mb-1">
-                  Change Status
-                </label>
+              <div className={isResolved ? disabledOverlay : ""}>
                 <select
                   value={status}
                   disabled={isResolved}
@@ -257,10 +257,7 @@ const AuthIssueDetails = () => {
               </div>
 
               {/* NOTES */}
-              <div>
-                <label className="block font-semibold mb-1">
-                  Resolution Notes
-                </label>
+              <div className={isResolved ? disabledOverlay : ""}>
                 <textarea
                   rows={4}
                   disabled={isResolved}
@@ -275,22 +272,26 @@ const AuthIssueDetails = () => {
                 <label className="block font-semibold mb-2">
                   Upload Resolution Proof
                 </label>
-                <input
-                  type="file"
-                  multiple
-                  disabled={isResolved}
-                  onChange={(e) => setFiles([...e.target.files])}
-                />
+                <div className={isResolved ? disabledOverlay : ""}>
+                  <input
+                    type="file"
+                    multiple
+                    disabled={isResolved}
+                    onChange={(e) => setFiles([...e.target.files])}
+                  />
+                </div>
               </div>
 
               {/* BUTTON */}
-              <button
-                onClick={handleUpdateStatus}
-                disabled={saving || issue.status === "RESOLVED" || isUnchanged}
-                className="w-full h-12 bg-primary font-bold rounded-xl disabled:opacity-50 cursor-pointer"
-              >
-                {saving ? "Updating..." : "Update Issue Status"}
-              </button>
+              <div className={isResolved ? disabledOverlay : ""}>
+                <button
+                  onClick={handleUpdateStatus}
+                  disabled={isResolved || saving || isUnchanged}
+                  className="w-full h-12 bg-primary font-bold rounded-xl disabled:opacity-50"
+                >
+                  {saving ? "Updating..." : "Update Issue Status"}
+                </button>
+              </div>
 
               {isUnchanged && issue.status !== "RESOLVED" && (
                 <p className="text-xs text-gray-500 text-center">

@@ -8,18 +8,46 @@ import User from "../models/User.js";
 export const getAssignedIssues = async (req, res) => {
   try {
     const clerkUserId = req.auth.userId;
+    const { status, category, priority, page = 1, limit = 5 } = req.query;
 
-    const authority = await User.findOne({ clerkUserId });
+    // 1️⃣ Find authority
+    const authority = await User.findOne({
+      clerkUserId,
+      role: "AUTHORITY",
+    });
+
     if (!authority) {
       return res.status(404).json({ success: false });
     }
 
-    const issues = await Issue.find({
-      assignedTo: authority._id, // ✅ Mongo ObjectId
-      status: { $ne: "RESOLVED" },
-    }).sort({ createdAt: -1 });
+    // 2️⃣ Build query
+    const query = {
+      assignedTo: authority._id,
+    };
 
-    res.json({ success: true, issues });
+    if (status) query.status = status;
+    if (category) query.category = category;
+    if (priority) query.priority = priority;
+
+    // 3️⃣ Pagination calculations
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [issues, total] = await Promise.all([
+      Issue.find(query).sort({ createdAt: -1 }).skip(skip).limit(Number(limit)),
+
+      Issue.countDocuments(query),
+    ]);
+
+    // 4️⃣ Send response with pagination
+    res.json({
+      success: true,
+      issues,
+      pagination: {
+        page: Number(page),
+        totalPages: Math.ceil(total / limit),
+        total,
+      },
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false });
@@ -110,8 +138,7 @@ export const updateStatus = async (req, res) => {
     }
 
     // 8️⃣ Handle resolution images (if uploaded)
-    const resolutionImages =
-      req.files?.map((file) => file.path) || [];
+    const resolutionImages = req.files?.map((file) => file.path) || [];
 
     if (resolutionImages.length > 0) {
       issue.resolutionImages.push(...resolutionImages);
@@ -145,5 +172,75 @@ export const updateStatus = async (req, res) => {
       success: false,
       message: "Failed to update issue status",
     });
+  }
+};
+
+/**
+ * GET /api/authority/dashboard/stats
+ */
+export const getAuthorityDashboardStats = async (req, res) => {
+  try {
+    const clerkUserId = req.auth.userId;
+
+    const authority = await User.findOne({ clerkUserId });
+    if (!authority) {
+      return res.status(404).json({ success: false });
+    }
+
+    const [totalAssigned, inProgress, resolved, open] = await Promise.all([
+      Issue.countDocuments({ assignedTo: authority._id }),
+      Issue.countDocuments({
+        assignedTo: authority._id,
+        status: "IN_PROGRESS",
+      }),
+      Issue.countDocuments({ assignedTo: authority._id, status: "RESOLVED" }),
+      Issue.countDocuments({ assignedTo: authority._id, status: "ASSIGNED" }),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalAssigned,
+        open,
+        inProgress,
+        resolved,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+};
+
+/**
+ * GET /api/authority/issues/recent
+ * Returns latest 5 assigned issues
+ */
+export const getRecentAssignedIssues = async (req, res) => {
+  try {
+    const clerkUserId = req.auth.userId;
+
+    const authority = await User.findOne({
+      clerkUserId,
+      role: "AUTHORITY",
+    });
+
+    if (!authority) {
+      return res.status(404).json({ success: false });
+    }
+
+    const issues = await Issue.find({
+      assignedTo: authority._id,
+    })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      success: true,
+      issues,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 };

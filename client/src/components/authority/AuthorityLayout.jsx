@@ -2,9 +2,9 @@ import { NavLink } from "react-router-dom";
 
 const AuthorityLayout = ({ children }) => {
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r p-4">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
+      {/* 🔹 FIXED SIDEBAR */}
+      <aside className="w-64 shrink-0 bg-white border-r p-4">
         <h2 className="text-xl font-bold mb-6">JanSamadhan</h2>
 
         <nav className="flex flex-col gap-2">
@@ -23,7 +23,7 @@ const AuthorityLayout = ({ children }) => {
               isActive ? "font-semibold text-primary" : "text-gray-500"
             }
           >
-           Dashboard
+            Dashboard
           </NavLink>
 
           <NavLink
@@ -32,7 +32,7 @@ const AuthorityLayout = ({ children }) => {
               isActive ? "font-semibold text-primary" : "text-gray-500"
             }
           >
-           Map View
+            Map View
           </NavLink>
 
           <NavLink
@@ -41,7 +41,7 @@ const AuthorityLayout = ({ children }) => {
               isActive ? "font-semibold text-primary" : "text-gray-500"
             }
           >
-           Settings
+            Settings
           </NavLink>
 
           <NavLink
@@ -50,13 +50,15 @@ const AuthorityLayout = ({ children }) => {
               isActive ? "font-semibold text-primary" : "text-gray-500"
             }
           >
-           Support
+            Support
           </NavLink>
         </nav>
       </aside>
 
-      {/* Content */}
-      <main className="flex-1">{children}</main>
+      {/* 🔹 SCROLLABLE CONTENT */}
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
     </div>
   );
 };
