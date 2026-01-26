@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../lib/axios";
 import LocationPreviewMap from "../../components/citizen/LocationPreviewMap";
 import ReportStepper from "../../components/citizen/ReportStepper";
+import { useAuth } from "@clerk/clerk-react";
 
 const CATEGORY_MAP = {
   "Street Light": "STREET_LIGHT",
@@ -27,29 +28,16 @@ const CitizenReviewIssue = () => {
   const finalDescription =
     issueDraft.extraDescription?.trim() || issueDraft.description?.trim();
 
+  const { getToken } = useAuth();
+
   const handleSubmit = async () => {
     try {
-      // ✅ Validation
-      if (!issueDraft.title?.trim()) {
-        alert("Title is required");
-        return;
-      }
-
-      if (!finalDescription) {
-        alert("Description is required");
-        return;
-      }
-
-      if (!issueDraft.location.lat || !issueDraft.location.lng) {
-        alert("Please select a location");
-        return;
-      }
+      const token = await getToken();
 
       const formData = new FormData();
 
       formData.append("title", issueDraft.title.trim());
 
-      // ✅ Normalized category (from Code 1)
       const normalizedCategory =
         CATEGORY_MAP[issueDraft.category] ?? issueDraft.category?.toUpperCase();
 
@@ -65,23 +53,23 @@ const CitizenReviewIssue = () => {
         })
       );
 
-      // ✅ SINGLE image loop (critical fix)
       issueDraft.images.forEach((img) => {
         if (img instanceof File) {
           formData.append("images", img);
         }
       });
 
-      await axios.post("/api/issues", formData);
+      await axios.post("/api/issues", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       clearIssueDraft();
       navigate("/citizen/my-issues");
     } catch (error) {
-      console.error(error.response?.data || error);
-      alert(
-        error.response?.data?.message ||
-          "Failed to submit issue. Please try again."
-      );
+      console.error(error);
+      alert("Failed to submit issue");
     }
   };
 

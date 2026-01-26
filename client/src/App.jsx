@@ -13,154 +13,51 @@ import AuthDashboard from "./pages/authority/Dashboard";
 import AuthIssueDetails from "./pages/authority/IssueDetails";
 import AuthMapView from "./pages/authority/MapView";
 import AuthSettings from "./pages/authority/Settings";
+import AuthoritySupport from "./pages/authority/Support";
 
-
-import AdminAnalytics from "./pages/admin/Analytics";
-import AdminAuthorities from "./pages/admin/Authorities";
+import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
-import AdminHeatmap from "./pages/admin/Heatmap";
+import AdminIssues from "./pages/admin/AdminIssues";
+import AuthorityManagement from "./pages/admin/AuthorityManagement";
+import AdminAnalytics from "./pages/admin/Analytics";
 import AdminSettings from "./pages/admin/Settings";
-import RequireRole from "./components/auth/RequireRole";
+
 import PostLoginRedirect from "./components/auth/PostLoginRedirect";
 
 const App = () => {
   return (
     <>
       <PostLoginRedirect />
-      
+
       <Routes>
         {/* 🌍 PUBLIC ROUTES */}
         <Route path="/" element={<CitizenHome />} />
         <Route path="/citizen/issues/:id" element={<CitizenIssueDetails />} />
 
         {/* 👤 CITIZEN ROUTES */}
-        <Route
-          path="/citizen/report"
-          element={
-            <RequireRole allowedRoles={["CITIZEN"]}>
-              <CitizenReportIssue />
-            </RequireRole>
-          }
-        />
-
-        <Route
-          path="/citizen/report/location"
-          element={
-            <RequireRole allowedRoles={["CITIZEN"]}>
-              <CitizenReportLocation />
-            </RequireRole>
-          }
-        />
-
-        <Route
-          path="/citizen/report/review"
-          element={
-            <RequireRole allowedRoles={["CITIZEN"]}>
-              <CitizenReviewIssue />
-            </RequireRole>
-          }
-        />
-
-        <Route
-          path="/citizen/my-issues"
-          element={
-            <RequireRole allowedRoles={["CITIZEN"]}>
-              <CitizenMyIssues />
-            </RequireRole>
-          }
-        />
+        <Route path="/citizen/report" element={<CitizenReportIssue />} />
+        <Route path="/citizen/report/location" element={<CitizenReportLocation />} />
+        <Route path="/citizen/report/review" element={<CitizenReviewIssue />} />
+        <Route path="/citizen/my-issues" element={<CitizenMyIssues />} />
 
         {/* 🏛️ AUTHORITY ROUTES */}
-        <Route
-          path="/authority/dashboard"
-          element={
-            <RequireRole allowedRoles={["AUTHORITY"]}>
-              <AuthDashboard />
-            </RequireRole>
-          }
-        />
+        <Route path="/authority/dashboard" element={<AuthDashboard />} />
+        <Route path="/authority/assigned-issues" element={<AuthAssignedIssues />} />
+        <Route path="/authority/issues/:id" element={<AuthIssueDetails />} />
+        <Route path="/authority/map" element={<AuthMapView />} />
+        <Route path="/authority/settings" element={<AuthSettings />} />
+        <Route path="/authority/support" element={<AuthoritySupport />} />
 
-        <Route
-          path="/authority/assigned-issues"
-          element={
-            <RequireRole allowedRoles={["AUTHORITY"]}>
-              <AuthAssignedIssues />
-            </RequireRole>
-          }
-        />
+         {/* 🛠️ ADMIN ROUTES (STATIC SIDEBAR) */}
+      <Route path="/admin" element={<AdminLayout />}>
 
-        <Route
-          path="/authority/issues/:id"
-          element={
-            <RequireRole allowedRoles={["AUTHORITY"]}>
-              <AuthIssueDetails />
-            </RequireRole>
-          }
-        />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="issues" element={<AdminIssues />} />
+        <Route path="authorities" element={<AuthorityManagement />} />
+        <Route path="analytics" element={<AdminAnalytics />} />
+        <Route path="settings" element={<AdminSettings />} />
 
-        <Route
-          path="/authority/map"
-          element={
-            <RequireRole allowedRoles={["AUTHORITY"]}>
-              <AuthMapView />
-            </RequireRole>
-          }
-        />
-
-        <Route
-          path="/authority/settings"
-          element={
-            <RequireRole allowedRoles={["AUTHORITY"]}>
-              <AuthSettings />
-            </RequireRole>
-          }
-        />
-
-        {/* 🛠️ ADMIN ROUTES */}
-        <Route
-          path="/admin/dashboard"
-          element={
-            <RequireRole allowedRoles={["ADMIN"]}>
-              <AdminDashboard />
-            </RequireRole>
-          }
-        />
-
-        <Route
-          path="/admin/analytics"
-          element={
-            <RequireRole allowedRoles={["ADMIN"]}>
-              <AdminAnalytics />
-            </RequireRole>
-          }
-        />
-
-        <Route
-          path="/admin/authorities"
-          element={
-            <RequireRole allowedRoles={["ADMIN"]}>
-              <AdminAuthorities />
-            </RequireRole>
-          }
-        />
-
-        <Route
-          path="/admin/map"
-          element={
-            <RequireRole allowedRoles={["ADMIN"]}>
-              <AdminHeatmap />
-            </RequireRole>
-          }
-        />
-
-        <Route
-          path="/admin/settings"
-          element={
-            <RequireRole allowedRoles={["ADMIN"]}>
-              <AdminSettings />
-            </RequireRole>
-          }
-        />
+      </Route>
       </Routes>
     </>
   );

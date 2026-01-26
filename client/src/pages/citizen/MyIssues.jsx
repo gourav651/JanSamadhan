@@ -67,7 +67,7 @@ const CitizenMyIssues = () => {
 
   const paginatedIssues = sortedIssues.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   useEffect(() => {
@@ -177,9 +177,12 @@ const CitizenMyIssues = () => {
                 </button>
 
                 <button
-                  onClick={() =>
-                    navigate(`/citizen/issues/${issue._id || issue.id}`)
-                  }
+                  onClick={() => {
+                    console.log("Clicked issue object:", issue);
+                    console.log("Clicked issue ID:", issue._id);
+
+                    navigate(`/citizen/issues/${issue._id}`);
+                  }}
                   className="text-primary text-sm font-medium cursor-pointer"
                 >
                   View Details →

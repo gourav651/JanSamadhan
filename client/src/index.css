@@ -1,2 +1,20 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+@custom-variant dark (&:is(.dark *));
+/* ===== Calendar dropdown list (month/year) ===== */
+
+.rdp-dropdown {
+  background-color: white !important;
+  color: black !important;
+}
+
+.rdp-dropdown option {
+  background-color: white !important;
+  color: black !important;
+}
+
+.rdp-dropdown option:checked {
+  background-color: #2563eb !important; /* blue */
+  color: white !important;
+}

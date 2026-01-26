@@ -16,6 +16,23 @@ const userSchema = new mongoose.Schema(
       enum: ["CITIZEN", "AUTHORITY", "ADMIN"],
       default: "CITIZEN",
     },
+
+    // ===== AUTHORITY MANAGEMENT FIELDS =====
+    department: {
+      type: String,
+      default: null,
+    },
+
+    assignedArea: {
+      type: String,
+      default: null,
+    },
+
+    status: {
+      type: String,
+      enum: ["ACTIVE", "SUSPENDED", "ON_LEAVE"],
+      default: "ACTIVE",
+    },
   },
   { timestamps: true }
 );

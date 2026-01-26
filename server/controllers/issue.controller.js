@@ -1,4 +1,5 @@
 import Issue from "../models/Issue.js";
+import User from "../models/User.js";
 
 /**
  * GET NEARBY ISSUES
@@ -20,7 +21,7 @@ export const getNearbyIssues = async (req, res) => {
         $nearSphere: {
           $geometry: {
             type: "Point",
-            coordinates: [Number(lng), Number(lat)], // lng first
+            coordinates: [Number(lng), Number(lat)],
           },
           $maxDistance: Number(radius),
         },
@@ -38,110 +39,114 @@ export const getNearbyIssues = async (req, res) => {
  * CREATE ISSUE
  * POST /api/issues
  */
-
 export const createIssue = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILES:", req.files);
+    const clerkUserId = req.auth.userId;
 
-    const title = req.body?.title?.trim();
-    const description = req.body?.description?.trim();
-    const category = req.body?.category?.trim();
-
-    if (!title || !description || !category) {
-      return res.status(400).json({
-        success: false,
-        message: "Title, category and description are required",
-      });
+    const user = await User.findOne({ clerkUserId });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Images uploaded by Cloudinary
-    const images = req.files?.map((file) => file.path) || [];
-
-    // ✅ SAFE location parsing
-    let locationData;
-    try {
-      locationData = JSON.parse(req.body.location);
-    } catch (err) {
-      console.error("❌ Location parse error:", err);
-      return res.status(400).json({
-        success: false,
-        message: "Invalid location data",
-      });
-    }
-
-    const lat = Number(locationData.lat);
-    const lng = Number(locationData.lng);
-
-    if (!lat || !lng) {
-      return res.status(400).json({
-        success: false,
-        message: "Location is required",
-      });
-    }
+    // 🔥 CRITICAL FIX
+    const location = JSON.parse(req.body.location);
 
     const issue = await Issue.create({
-      title,
-      description,
-      category,
-      images,
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category,
+
+      images: req.files?.map((f) => f.path) || [],
+
       location: {
         type: "Point",
-        coordinates: [lng, lat],
-        address: locationData.address || "",
+        coordinates: [
+          Number(location.lng),
+          Number(location.lat),
+        ],
+        address: location.address,
       },
-      reportedBy: "PUBLIC_USER",
-      status: "OPEN",
-      upvotes: 0,
+
+      reportedBy: user._id,
+
+      status: "REPORTED",
+      priority: "NORMAL",
+
+      statusHistory: [
+        {
+          status: "REPORTED",
+          changedBy: user._id,
+        },
+      ],
     });
 
-    return res.status(201).json({ success: true, issue });
+    res.status(201).json({ success: true, issue });
   } catch (err) {
-    console.error("🔥 CREATE ISSUE ERROR:", err);
-    return res.status(500).json({
-      success: false,
-      message: err.message || "Internal server error",
-    });
+    console.error("CREATE ISSUE ERROR:", err);
+    res.status(500).json({ success: false });
   }
 };
 
 
-// GET /api/issues/:id
 
+
+/**
+ * GET ISSUE BY ID
+ * /api/issues/:id
+ */
 export const getIssueById = async (req, res) => {
   try {
-    const issue = await Issue.findById(req.params.id);
+    const issue = await Issue.findById(req.params.id).populate(
+      "assignedTo",
+      "name email",
+    );
 
     if (!issue) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Issue not found" });
+      return res.status(404).json({ success: false });
     }
 
-    res.json({ success: true, issue });
+    res.json({ success: true, data: issue });
   } catch (err) {
     res.status(500).json({ success: false });
   }
 };
 
+/**
+ * GET MY ISSUES
+ * /api/issues/my
+ */
 export const getMyIssues = async (req, res) => {
   try {
+    const clerkUserId = req.auth.userId;
+
+    const user = await User.findOne({ clerkUserId });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     const issues = await Issue.find({
-      reportedBy: "PUBLIC_USER",
+      reportedBy: user._id,
     }).sort({ createdAt: -1 });
 
     res.json({ success: true, issues });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false });
   }
 };
 
-// POST /api/issues/:id/comment
+/**
+ * ADD COMMENT
+ */
 export const addComment = async (req, res) => {
+  const user = await User.findOne({ clerkUserId: req.auth.userId });
   try {
     const { text } = req.body;
 
-    if (!text || !text.trim()) {
+    if (!text?.trim()) {
       return res
         .status(400)
         .json({ success: false, message: "Comment required" });
@@ -157,7 +162,7 @@ export const addComment = async (req, res) => {
 
     issue.comments.push({
       text,
-      author: "PUBLIC_USER", // later Clerk user
+      author: user._id,
       createdAt: new Date(),
     });
 
@@ -170,13 +175,15 @@ export const addComment = async (req, res) => {
   }
 };
 
-// POST /api/issues/:id/upvote
+/**
+ * UPVOTE ISSUE
+ */
 export const upvoteIssue = async (req, res) => {
   try {
     const issue = await Issue.findByIdAndUpdate(
       req.params.id,
-      { $inc: { upvotes: 1 } }, // increment by 1
-      { new: true }
+      { $inc: { upvotes: 1 } },
+      { new: true },
     );
 
     if (!issue) {

@@ -19,7 +19,7 @@ const CitizenIssueDetail = () => {
   const fetchIssue = async () => {
     try {
       const res = await axios.get(`/api/issues/${id}`);
-      setIssue(res.data.issue);
+      setIssue(res.data.data);
     } catch (err) {
       console.error("Failed to fetch issue", err);
     } finally {
@@ -58,7 +58,7 @@ const CitizenIssueDetail = () => {
           <IssueTimeline status={issue.status} />
           <IssueComments issue={issue} onCommentAdded={fetchIssue} />
         </div>
-        
+
         {/* RIGHT */}
         <div className="lg:col-span-1 self-start">
           <IssueSidebar issue={issue} />

@@ -4,7 +4,7 @@ import { requireAuth } from "../middlewares/requireAuth.js";
 
 const router = express.Router();
 
-router.post("/sync", syncUser);
+router.post("/sync", requireAuth, syncUser);
 router.get("/me", requireAuth, getMe);
 
 

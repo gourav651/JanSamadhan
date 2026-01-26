@@ -20,9 +20,16 @@ const issueSchema = new mongoose.Schema(
     },
 
     status: {
+  type: String,
+  enum: ["REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED"],
+  default: "REPORTED",
+},
+
+
+    priority: {
       type: String,
-      enum: ["OPEN", "IN_PROGRESS", "RESOLVED"],
-      default: "OPEN",
+      enum: ["LOW", "NORMAL", "HIGH"],
+      default: "NORMAL",
     },
 
     images: [
@@ -57,11 +64,49 @@ const issueSchema = new mongoose.Schema(
     ],
 
     reportedBy: {
-      type: String, // Clerk userId later
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
+
+    // =========================
+    // AUTHORITY FIELDS
+    // =========================
+
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    resolutionNotes: {
+      type: String,
+    },
+
+    resolutionImages: [
+      {
+        type: String, // Cloudinary URLs
+      },
+    ],
+
+    statusHistory: [
+      {
+        status: {
+          type: String,
+          enum: ["REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED"],
+          required: true,
+        },
+        changedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        changedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // 🔥 Geo index (important for map & nearby issues)
