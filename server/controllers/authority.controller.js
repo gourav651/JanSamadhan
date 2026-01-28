@@ -244,3 +244,56 @@ export const getRecentAssignedIssues = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
+/**
+ * GET /api/authority/issues/map
+ * Lightweight geo payload for map view
+ */
+
+export const getAuthorityMapIssues = async (req, res) => {
+  try {
+    const clerkUserId = req.auth.userId;
+    const { status, category, radius, lat, lng } = req.query;
+
+    const authority = await User.findOne({
+      clerkUserId,
+      role: "AUTHORITY",
+    });
+
+    if (!authority) {
+      return res.status(403).json({ success: false });
+    }
+
+    const query = {
+      assignedTo: authority._id,
+    };
+
+    // 🔹 Status filter
+    if (status) query.status = status;
+
+    // 🔹 Category filter
+    if (category) query.category = category;
+
+    // 🔹 Radius filter (geo)
+    if (lat && lng && radius) {
+      query.location = {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: [Number(lng), Number(lat)],
+          },
+          $maxDistance: Number(radius) * 1000, // km → meters
+        },
+      };
+    }
+
+    const issues = await Issue.find(query).select(
+      "title status category location",
+    );
+
+    res.json({ success: true, issues });
+  } catch (err) {
+    console.error("Map issues error:", err);
+    res.status(500).json({ success: false });
+  }
+};

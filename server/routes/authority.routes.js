@@ -6,6 +6,7 @@ import upload from "../middlewares/upload.js";
 import {
   getAssignedIssues,
   getAuthorityDashboardStats,
+  getAuthorityMapIssues,
   getIssueForAuthority,
   getRecentAssignedIssues,
   updateStatus,
@@ -13,7 +14,7 @@ import {
 
 const router = express.Router();
 
-// 🔐 AUTHORITY ONLY (ORDER MATTERS)
+// 🔐 AUTHORITY ONLY 
 router.use(requireAuth);
 router.use(requireRole(["AUTHORITY"]));
 
@@ -21,16 +22,15 @@ router.use(requireRole(["AUTHORITY"]));
 router.get("/issues/assigned", getAssignedIssues);
 router.get("/dashboard/stats", getAuthorityDashboardStats);
 router.get("/issues/recent", getRecentAssignedIssues);
+router.get("/issues/map", getAuthorityMapIssues);
 
 // 🔄 Update issue status + resolution proof
 router.patch(
   "/issues/:id/status",
   upload.array("resolutionImages", 5),
-  updateStatus
+  updateStatus,
 );
 
 router.get("/issues/:id", getIssueForAuthority);
-
-
 
 export default router;
