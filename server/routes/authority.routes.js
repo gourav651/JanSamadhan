@@ -7,8 +7,10 @@ import {
   getAssignedIssues,
   getAuthorityDashboardStats,
   getAuthorityMapIssues,
+  getAuthoritySettings,
   getIssueForAuthority,
   getRecentAssignedIssues,
+  updateAuthorityNotifications,
   updateStatus,
 } from "../controllers/authority.controller.js";
 
@@ -23,7 +25,12 @@ router.get("/issues/assigned", getAssignedIssues);
 router.get("/dashboard/stats", getAuthorityDashboardStats);
 router.get("/issues/recent", getRecentAssignedIssues);
 router.get("/issues/map", getAuthorityMapIssues);
-
+router.get(
+  "/settings",
+  requireAuth,
+  requireRole(["AUTHORITY"]),
+  getAuthoritySettings,
+);
 // 🔄 Update issue status + resolution proof
 router.patch(
   "/issues/:id/status",
@@ -31,6 +38,12 @@ router.patch(
   updateStatus,
 );
 
+router.patch(
+  "/settings/notifications",
+  requireAuth,
+  requireRole(["AUTHORITY"]),
+  updateAuthorityNotifications,
+);
 router.get("/issues/:id", getIssueForAuthority);
 
 export default router;

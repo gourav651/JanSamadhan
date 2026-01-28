@@ -297,3 +297,73 @@ export const getAuthorityMapIssues = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
+
+/**
+ * GET /api/authority/settings
+ */
+export const getAuthoritySettings = async (req, res) => {
+  try {
+    const clerkUserId = req.auth.userId;
+
+    const authority = await User.findOne({
+      clerkUserId,
+      role: "AUTHORITY",
+    }).select(
+      "name clerkUserId department assignedArea notificationPrefs",
+    );
+
+    if (!authority) {
+      return res.status(404).json({ success: false });
+    }
+
+    res.json({
+      success: true,
+      data: authority,
+    });
+  } catch (err) {
+    console.error("Get authority settings error:", err);
+    res.status(500).json({ success: false });
+  }
+};
+
+
+/**
+ * PATCH /api/authority/settings/notifications
+ */
+export const updateAuthorityNotifications = async (req, res) => {
+  try {
+    const clerkUserId = req.auth.userId;
+    const updates = req.body; // { email, push, sms }
+
+    const authority = await User.findOne({
+      clerkUserId,
+      role: "AUTHORITY",
+    });
+
+    if (!authority) {
+      return res.status(404).json({ success: false });
+    }
+
+    authority.notificationPrefs = {
+      ...authority.notificationPrefs,
+      ...updates,
+    };
+
+    await authority.save();
+
+    // OPTIONAL: activity log
+    await ActivityLog.create({
+      action: "AUTHORITY_SETTINGS_UPDATED",
+      performedBy: clerkUserId,
+      role: "AUTHORITY",
+      metadata: updates,
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Update notification settings error:", err);
+    res.status(500).json({ success: false });
+  }
+};
+

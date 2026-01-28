@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
       default: "CITIZEN",
     },
 
-    // ===== AUTHORITY MANAGEMENT FIELDS =====
+
     department: {
       type: String,
       default: null,
@@ -33,8 +33,15 @@ const userSchema = new mongoose.Schema(
       enum: ["ACTIVE", "SUSPENDED", "ON_LEAVE"],
       default: "ACTIVE",
     },
+
+    // Keep this OPTIONAL (not forced for citizens)
+    notificationPrefs: {
+      email: { type: Boolean, default: true },
+      push: { type: Boolean, default: true },
+      sms: { type: Boolean, default: false },
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("User", userSchema);

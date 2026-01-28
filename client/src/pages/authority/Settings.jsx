@@ -1,17 +1,76 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
-import { SignOutButton } from "@clerk/clerk-react";
+import { SignOutButton, useAuth } from "@clerk/clerk-react";
+import axios from "axios";
 
 const AuthSettings = () => {
-  const [emailNotif, setEmailNotif] = useState(true);
-  const [pushNotif, setPushNotif] = useState(true);
+  const { getToken } = useAuth();
+
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
+
+  const [emailNotif, setEmailNotif] = useState(false);
+  const [pushNotif, setPushNotif] = useState(false);
   const [smsNotif, setSmsNotif] = useState(false);
+
+  const updateNotification = async (updates) => {
+    try {
+      const token = await getToken();
+
+      await axios.patch(
+        "http://localhost:5000/api/authority/settings/notifications",
+        updates,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+    } catch (err) {
+      console.error("Notification update failed", err);
+    }
+  };
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const token = await getToken();
+
+        const res = await axios.get(
+          "http://localhost:5000/api/authority/settings",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+
+        const data = res.data.data;
+
+        setProfile(data);
+        setEmailNotif(data.notificationPrefs.email);
+        setPushNotif(data.notificationPrefs.push);
+        setSmsNotif(data.notificationPrefs.sms);
+      } catch (err) {
+        console.error("Settings load error", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, [getToken]);
+
+  if (loading) {
+    return (
+      <AuthorityLayout>
+        <div className="flex items-center justify-center h-screen text-gray-400">
+          Loading settings…
+        </div>
+      </AuthorityLayout>
+    );
+  }
 
   return (
     <AuthorityLayout>
       <main className="flex justify-center py-10 px-6 bg-background-light min-h-screen">
         <div className="max-w-200 w-full flex flex-col gap-8">
-
           {/* PAGE HEADER */}
           <div className="px-4">
             <h1 className="text-4xl font-black">Authority Settings</h1>
@@ -22,13 +81,17 @@ const AuthSettings = () => {
 
           {/* PROFILE INFO */}
           <section className="bg-white rounded-xl border shadow-sm">
-            <h2 className="text-xl font-bold px-6 pt-6 pb-2">
-              Profile Info
-            </h2>
+            <h2 className="text-xl font-bold px-6 pt-6 pb-2">Profile Info</h2>
 
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ReadonlyField label="Authority Name" value="Jane Doe" />
-              <ReadonlyField label="Authority ID" value="AUTH-9928-XY" />
+              <ReadonlyField
+                label="Authority Name"
+                value={profile?.name || "—"}
+              />
+              <ReadonlyField
+                label="Authority ID"
+                value={profile?.clerkUserId || "—"}
+              />
             </div>
           </section>
 
@@ -41,11 +104,11 @@ const AuthSettings = () => {
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               <ReadonlyField
                 label="Department"
-                value="Public Works & Sanitation"
+                value={profile?.department || "—"}
               />
               <ReadonlyField
                 label="Assigned District"
-                value="North Metro District 04"
+                value={profile?.assignedArea || "—"}
               />
             </div>
           </section>
@@ -62,7 +125,10 @@ const AuthSettings = () => {
                 title="Email Notifications"
                 desc="Receive detailed daily summaries of new issues"
                 enabled={emailNotif}
-                onToggle={() => setEmailNotif(!emailNotif)}
+                onToggle={() => {
+                  setEmailNotif((v) => !v);
+                  updateNotification({ email: !emailNotif });
+                }}
               />
 
               <ToggleRow
@@ -70,7 +136,10 @@ const AuthSettings = () => {
                 title="Push Notifications"
                 desc="Real-time alerts for status updates on active issues"
                 enabled={pushNotif}
-                onToggle={() => setPushNotif(!pushNotif)}
+                onToggle={() => {
+                  setPushNotif((v) => !v);
+                  updateNotification({ push: !pushNotif });
+                }}
               />
 
               <ToggleRow
@@ -78,7 +147,10 @@ const AuthSettings = () => {
                 title="SMS Alerts"
                 desc="Emergency alerts for high-priority civic hazards"
                 enabled={smsNotif}
-                onToggle={() => setSmsNotif(!smsNotif)}
+                onToggle={() => {
+                  setSmsNotif((v) => !v);
+                  updateNotification({ sms: !smsNotif });
+                }}
               />
             </div>
           </section>
@@ -93,7 +165,6 @@ const AuthSettings = () => {
               </button>
             </SignOutButton>
           </div>
-
         </div>
       </main>
     </AuthorityLayout>
