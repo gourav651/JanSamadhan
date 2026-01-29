@@ -21,6 +21,7 @@ import AdminIssues from "./pages/admin/AdminIssues";
 import AuthorityManagement from "./pages/admin/AuthorityManagement";
 import AdminAnalytics from "./pages/admin/Analytics";
 import AdminSettings from "./pages/admin/Settings";
+import AdminSupportTickets from "./pages/admin/AdminSupportTickets";
 
 import PostLoginRedirect from "./components/auth/PostLoginRedirect";
 
@@ -36,28 +37,33 @@ const App = () => {
 
         {/* 👤 CITIZEN ROUTES */}
         <Route path="/citizen/report" element={<CitizenReportIssue />} />
-        <Route path="/citizen/report/location" element={<CitizenReportLocation />} />
+        <Route
+          path="/citizen/report/location"
+          element={<CitizenReportLocation />}
+        />
         <Route path="/citizen/report/review" element={<CitizenReviewIssue />} />
         <Route path="/citizen/my-issues" element={<CitizenMyIssues />} />
 
         {/* 🏛️ AUTHORITY ROUTES */}
         <Route path="/authority/dashboard" element={<AuthDashboard />} />
-        <Route path="/authority/assigned-issues" element={<AuthAssignedIssues />} />
+        <Route
+          path="/authority/assigned-issues"
+          element={<AuthAssignedIssues />}
+        />
         <Route path="/authority/issues/:id" element={<AuthIssueDetails />} />
         <Route path="/authority/map" element={<AuthMapView />} />
         <Route path="/authority/settings" element={<AuthSettings />} />
         <Route path="/authority/support" element={<AuthoritySupport />} />
 
-         {/* 🛠️ ADMIN ROUTES (STATIC SIDEBAR) */}
-      <Route path="/admin" element={<AdminLayout />}>
-
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="issues" element={<AdminIssues />} />
-        <Route path="authorities" element={<AuthorityManagement />} />
-        <Route path="analytics" element={<AdminAnalytics />} />
-        <Route path="settings" element={<AdminSettings />} />
-
-      </Route>
+        {/* 🛠️ ADMIN ROUTES (STATIC SIDEBAR) */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="issues" element={<AdminIssues />} />
+          <Route path="authorities" element={<AuthorityManagement />} />
+          <Route path="support" element={<AdminSupportTickets />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
       </Routes>
     </>
   );

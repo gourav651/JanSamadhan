@@ -9,9 +9,7 @@ const AdminLayout = () => {
         <div className="p-6 pb-4">
           <div className="flex items-center gap-3">
             <div className="bg-primary rounded-lg size-10 flex items-center justify-center">
-              <span className="material-symbols-outlined">
-                icon
-              </span>
+              <span className="material-symbols-outlined">icon</span>
             </div>
             <h1 className="text-xl font-bold text-slate-900">CivicAdmin</h1>
           </div>
@@ -31,15 +29,16 @@ const AdminLayout = () => {
             label="Authorities"
           />
           <SidebarLink
+            to="/admin/support"
+            icon="support_agent"
+            label="Support Tickets"
+          />
+          <SidebarLink
             to="/admin/analytics"
             icon="bar_chart"
             label="Analytics & Insights"
           />
-          <SidebarLink
-            to="/admin/settings"
-            icon="settings"
-            label="Settings"
-          />
+          <SidebarLink to="/admin/settings" icon="settings" label="Settings" />
         </nav>
 
         {/* Admin Profile */}

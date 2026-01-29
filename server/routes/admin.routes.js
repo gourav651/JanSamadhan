@@ -14,6 +14,7 @@ import {
   assignAuthorityArea,
   updateAuthorityStatus,
 } from "../controllers/admin.controller.js";
+import { getAllSupportTickets, updateTicketStatus } from "../controllers/support.controller.js";
 
 
 const router = express.Router();
@@ -49,10 +50,12 @@ router.get("/issues/unassigned", getUnassignedIssues);
 ===================== */
 router.patch("/issues/:id/assign", assignIssueToAuthority);
 router.get("/authorities", getAuthorities);
+router.get("/support/tickets", getAllSupportTickets);
 
 router.post("/authorities", createAuthority);
 router.patch("/authorities/:id", updateAuthority);
 router.patch("/authorities/:id/status", updateAuthorityStatus);
 router.patch("/authorities/:id/assign-area", assignAuthorityArea);
+router.patch("/support/tickets/:id/status", updateTicketStatus);
 
 export default router;

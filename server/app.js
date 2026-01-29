@@ -5,6 +5,7 @@ import issueRoutes from "./routes/issue.routes.js";
 import authorityRoutes from "./routes/authority.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import supportRoutes from "./routes/support.routes.js";
 
 const app = express();
 
@@ -26,8 +27,9 @@ app.use("/api/issues", issueRoutes);
 app.use("/api/authority", authorityRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/support", supportRoutes);
 
-// 🔥 GLOBAL ERROR HANDLER (must be last)
+// 🔥 GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
   console.error("🔥 GLOBAL ERROR:", err);
 
