@@ -1,6 +1,5 @@
 import Issue from "../models/Issue.js";
 import User from "../models/User.js";
-import ActivityLog from "../models/ActivityLog.js";
 
 /* =====================
    DASHBOARD STATS
@@ -384,5 +383,456 @@ export const assignAuthorityArea = async (req, res) => {
   } catch (err) {
     console.error("ASSIGN AUTHORITY AREA ERROR:", err);
     res.status(500).json({ success: false });
+  }
+};
+
+/* =====================================================
+   ADMIN ANALYTICS (READ-ONLY)
+   Used by: Admin Dashboard & Analytics Pages
+===================================================== */
+/**
+ * GET /api/admin/analytics/dashboard
+ * Used by: AdminDashboard.jsx
+ */
+export const getDashboardAnalytics = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const last7Days = new Date();
+    last7Days.setDate(now.getDate() - 7);
+
+    const prev7Days = new Date();
+    prev7Days.setDate(now.getDate() - 14);
+
+    /* =====================
+       BASIC COUNTS
+    ===================== */
+    const [totalIssues, resolvedIssues, activeCitizens] = await Promise.all([
+      Issue.countDocuments(),
+      Issue.countDocuments({ status: "RESOLVED" }),
+      User.countDocuments({ role: "CITIZEN" }),
+    ]);
+
+    /* =====================
+       AVG RESOLUTION TIME
+       (LAST 7 DAYS vs PREVIOUS 7 DAYS)
+    ===================== */
+    const getAvgResolution = async (from, to) => {
+      const issues = await Issue.find({
+        status: "RESOLVED",
+        createdAt: { $gte: from, $lt: to },
+        "statusHistory.status": "RESOLVED",
+      }).select("statusHistory");
+
+      let totalMs = 0;
+      let count = 0;
+
+      issues.forEach((issue) => {
+        const reported = issue.statusHistory.find(
+          (s) => s.status === "REPORTED",
+        );
+        const resolved = issue.statusHistory.find(
+          (s) => s.status === "RESOLVED",
+        );
+
+        if (reported && resolved) {
+          totalMs +=
+            new Date(resolved.changedAt) - new Date(reported.changedAt);
+          count++;
+        }
+      });
+
+      return count ? totalMs / count : 0;
+    };
+
+    const currentAvgMs = await getAvgResolution(last7Days, now);
+    const previousAvgMs = await getAvgResolution(prev7Days, last7Days);
+
+    const avgResolutionHours = currentAvgMs
+      ? Math.round(currentAvgMs / (1000 * 60 * 60))
+      : 0;
+
+    let avgResolutionTrend = "SAME";
+    if (previousAvgMs > 0) {
+      if (currentAvgMs < previousAvgMs) avgResolutionTrend = "DOWN";
+      else if (currentAvgMs > previousAvgMs) avgResolutionTrend = "UP";
+    }
+
+    /* =====================
+       ISSUES TREND (LAST 30 DAYS)
+    ===================== */
+    const last30Days = new Date();
+    last30Days.setDate(now.getDate() - 30);
+
+    const trend = await Issue.aggregate([
+      {
+        $match: { createdAt: { $gte: last30Days } },
+      },
+      {
+        $group: {
+          _id: {
+            date: {
+              $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+            },
+          },
+          reported: { $sum: 1 },
+          resolved: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0],
+            },
+          },
+        },
+      },
+      { $sort: { "_id.date": 1 } },
+    ]);
+
+    /* =====================
+       ISSUE BREAKDOWN
+    ===================== */
+    const categoryBreakdown = await Issue.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    /* =====================
+       RECENT ISSUES (LAST 7 DAYS)
+    ===================== */
+    const recentIssues = await Issue.find({
+      createdAt: { $gte: last7Days },
+    })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select("title category location.address createdAt status");
+
+    return res.json({
+      success: true,
+      data: {
+        cards: {
+          totalIssues,
+          resolvedIssues,
+          avgResolutionHours,
+          avgResolutionTrend, // 👈 IMPORTANT
+          activeCitizens,
+        },
+        trend,
+        categoryBreakdown,
+        recentIssues,
+      },
+    });
+  } catch (error) {
+    console.error("DASHBOARD ANALYTICS ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to load dashboard analytics",
+    });
+  }
+};
+
+/* =====================================================
+   ADMIN ANALYTICS & INSIGHTS (READ-ONLY)
+   Used by: AdminAnalytics.jsx
+===================================================== */
+/**
+ * GET /api/admin/analytics/insights
+ * Query params:
+ *  - from (optional)
+ *  - to (optional)
+ */
+export const getAnalyticsInsights = async (req, res) => {
+  try {
+    const { from, to, severity, district, department } = req.query;
+
+    const matchStage = {};
+
+    if (from || to) {
+      matchStage.createdAt = {};
+      if (from) matchStage.createdAt.$gte = new Date(from);
+      if (to) matchStage.createdAt.$lte = new Date(to);
+    }
+
+    if (severity && severity !== "ALL") {
+      matchStage.severity = severity;
+    }
+
+    if (district && district !== "ALL") {
+      matchStage["location.district"] = district;
+    }
+
+    /* =====================
+       TREND (FILTERED)
+    ===================== */
+    const trend = await Issue.aggregate([
+      { $match: matchStage },
+      {
+        $group: {
+          _id: {
+            date: {
+              $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+            },
+          },
+          reported: { $sum: 1 },
+          resolved: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0],
+            },
+          },
+        },
+      },
+      { $sort: { "_id.date": 1 } },
+    ]);
+
+    /* =====================
+       KPI CALCULATIONS
+    ===================== */
+    const totalIssues = await Issue.countDocuments(matchStage);
+
+    const resolvedCount = await Issue.countDocuments({
+      ...matchStage,
+      status: "RESOLVED",
+    });
+
+    const resolutionRate = totalIssues
+      ? Math.round((resolvedCount / totalIssues) * 1000) / 10
+      : 0;
+
+    const criticalBacklog = await Issue.countDocuments({
+      ...matchStage,
+      severity: { $in: ["HIGH", "CRITICAL"] },
+      status: { $ne: "RESOLVED" },
+    });
+
+    /* =====================
+   AUTHORITY UTILIZATION
+===================== */
+    const totalAuthorities = await User.countDocuments({
+      role: "AUTHORITY",
+      status: "ACTIVE",
+    });
+
+    const activeAuthorities = await Issue.distinct("assignedTo", {
+      ...matchStage,
+      assignedTo: { $ne: null },
+    });
+
+    const authorityUtilization = totalAuthorities
+      ? Math.round((activeAuthorities.length / totalAuthorities) * 100)
+      : 0;
+
+    /* =====================
+       AVG RESOLUTION TIME
+    ===================== */
+    const resolvedIssues = await Issue.find({
+      ...matchStage,
+      status: "RESOLVED",
+      "statusHistory.status": "RESOLVED",
+    }).select("statusHistory");
+
+    let totalMs = 0;
+    let count = 0;
+
+    resolvedIssues.forEach((issue) => {
+      const reported = issue.statusHistory.find((s) => s.status === "REPORTED");
+      const resolved = issue.statusHistory.find((s) => s.status === "RESOLVED");
+      if (reported && resolved) {
+        totalMs += new Date(resolved.changedAt) - new Date(reported.changedAt);
+        count++;
+      }
+    });
+
+    const avgResolutionDays = count
+      ? Math.round((totalMs / count / 86400000) * 10) / 10
+      : 0;
+
+    /* =====================
+   ISSUE STATUS BY DEPARTMENT
+===================== */
+const issueStatusByDepartment = await Issue.aggregate([
+  { $match: matchStage }, // ✅ use filters properly
+
+  {
+    $group: {
+      _id: "$department",
+      resolved: {
+        $sum: { $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0] },
+      },
+      inProgress: {
+        $sum: {
+          $cond: [
+            { $in: ["$status", ["ASSIGNED", "IN_PROGRESS"]] },
+            1,
+            0,
+          ],
+        },
+      },
+      open: {
+        $sum: { $cond: [{ $eq: ["$status", "REPORTED"] }, 1, 0] },
+      },
+    },
+  },
+
+  {
+    $project: {
+      _id: 0,
+      department: "$_id",
+      resolved: 1,
+      inProgress: 1,
+      open: 1,
+      total: { $add: ["$resolved", "$inProgress", "$open"] },
+    },
+  },
+
+  { $sort: { total: -1 } },
+]);
+
+/* =====================
+   AUTHORITY PERFORMANCE
+===================== */
+const authorityPerformance = await Issue.aggregate([
+  { $match: { assignedTo: { $ne: null } } },
+
+  {
+    $lookup: {
+      from: "users",
+      localField: "assignedTo",
+      foreignField: "_id",
+      as: "authority",
+    },
+  },
+  { $unwind: "$authority" },
+
+  {
+    $group: {
+      _id: "$authority._id",
+      name: { $first: "$authority.name" },
+      department: { $first: "$authority.department" },
+
+      assigned: { $sum: 1 },
+
+      resolved: {
+        $sum: { $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0] },
+      },
+
+      totalResolutionMs: {
+        $sum: {
+          $cond: [
+            { $eq: ["$status", "RESOLVED"] },
+            {
+              $subtract: [
+                { $arrayElemAt: ["$statusHistory.changedAt", -1] },
+                { $arrayElemAt: ["$statusHistory.changedAt", 0] },
+              ],
+            },
+            0,
+          ],
+        },
+      },
+    },
+  },
+
+  {
+    $project: {
+      authorityName: "$name",
+      department: 1,
+      assigned: 1,
+
+      resolvedPercent: {
+        $cond: [
+          { $gt: ["$assigned", 0] },
+          { $round: [{ $multiply: [{ $divide: ["$resolved", "$assigned"] }, 100] }, 1] },
+          0,
+        ],
+      },
+
+      avgResolutionDays: {
+        $cond: [
+          { $gt: ["$resolved", 0] },
+          { $round: [{ $divide: ["$totalResolutionMs", { $multiply: ["$resolved", 86400000] }] }, 1] },
+          0,
+        ],
+      },
+    },
+  },
+
+  { $sort: { resolvedPercent: -1 } },
+]);
+
+
+    return res.json({
+      success: true,
+      data: {
+        kpis: {
+          resolutionRate,
+          criticalBacklog,
+          avgResolutionDays,
+          authorityUtilization,
+        },
+        trend,
+        issueStatusByDepartment,
+        authorityPerformance,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+};
+
+/**
+ * GET /api/admin/analytics/export
+ * Exports dashboard report as CSV
+ */
+export const exportDashboardReport = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const last30Days = new Date();
+    last30Days.setDate(now.getDate() - 30);
+
+    // 1️⃣ Summary numbers
+    const [totalIssues, resolvedIssues, activeCitizens] = await Promise.all([
+      Issue.countDocuments(),
+      Issue.countDocuments({ status: "RESOLVED" }),
+      User.countDocuments({ role: "CITIZEN" }),
+    ]);
+
+    // 2️⃣ Issues list (last 30 days)
+    const issues = await Issue.find({
+      createdAt: { $gte: last30Days },
+    })
+      .sort({ createdAt: -1 })
+      .select("title category status createdAt location.address");
+
+    // 3️⃣ Build CSV
+    let csv = "ADMIN DASHBOARD REPORT\n\n";
+
+    csv += "SUMMARY\n";
+    csv += "Total Issues,Resolved Issues,Active Citizens\n";
+    csv += `${totalIssues},${resolvedIssues},${activeCitizens}\n\n`;
+
+    csv += "ISSUES (Last 30 Days)\n\n";
+    csv += "Title,Category,Status,Created Date,Location\n\n";
+
+    issues.forEach((issue) => {
+      csv += `"${issue.title}","${issue.category}","${issue.status}","${issue.createdAt.toISOString()}","${issue.location?.address || ""}"\n`;
+    });
+
+    // 4️⃣ Send as downloadable file
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=dashboard-report.csv",
+    );
+
+    return res.send(csv);
+  } catch (error) {
+    console.error("EXPORT REPORT ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to export report",
+    });
   }
 };

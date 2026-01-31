@@ -20,11 +20,10 @@ const issueSchema = new mongoose.Schema(
     },
 
     status: {
-  type: String,
-  enum: ["REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED"],
-  default: "REPORTED",
-},
-
+      type: String,
+      enum: ["REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED"],
+      default: "REPORTED",
+    },
 
     priority: {
       type: String,

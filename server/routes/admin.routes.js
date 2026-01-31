@@ -13,6 +13,9 @@ import {
   updateAuthority,
   assignAuthorityArea,
   updateAuthorityStatus,
+  getDashboardAnalytics,
+  getAnalyticsInsights,
+  exportDashboardReport,
 } from "../controllers/admin.controller.js";
 import { getAllSupportTickets, updateTicketStatus } from "../controllers/support.controller.js";
 
@@ -51,6 +54,9 @@ router.get("/issues/unassigned", getUnassignedIssues);
 router.patch("/issues/:id/assign", assignIssueToAuthority);
 router.get("/authorities", getAuthorities);
 router.get("/support/tickets", getAllSupportTickets);
+router.get("/analytics/dashboard",getDashboardAnalytics);
+router.get("/analytics/insights", getAnalyticsInsights);
+router.get("/analytics/export", exportDashboardReport);
 
 router.post("/authorities", createAuthority);
 router.patch("/authorities/:id", updateAuthority);

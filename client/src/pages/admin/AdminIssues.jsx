@@ -135,20 +135,6 @@ const AdminIssues = () => {
               Global Oversight
             </span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-semibold border border-slate-700">
-              <span className="material-symbols-outlined text-lg">
-                file_download
-              </span>
-              Export Issues
-            </button>
-
-            <button className="relative p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800">
-              <span className="material-symbols-outlined">notifications</span>
-              <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border border-[#0f172a]" />
-            </button>
-          </div>
         </header>
 
         {/* ================= BODY ================= */}
