@@ -1,5 +1,7 @@
 import Issue from "../models/Issue.js";
 import User from "../models/User.js";
+import SystemSettings from "../models/SystemSettings.js";
+import cloudinary from "../config/cloudinary.js";
 
 /* =====================
    DASHBOARD STATS
@@ -650,116 +652,126 @@ export const getAnalyticsInsights = async (req, res) => {
     /* =====================
    ISSUE STATUS BY DEPARTMENT
 ===================== */
-const issueStatusByDepartment = await Issue.aggregate([
-  { $match: matchStage }, // ✅ use filters properly
+    const issueStatusByDepartment = await Issue.aggregate([
+      { $match: matchStage }, // ✅ use filters properly
 
-  {
-    $group: {
-      _id: "$department",
-      resolved: {
-        $sum: { $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0] },
-      },
-      inProgress: {
-        $sum: {
-          $cond: [
-            { $in: ["$status", ["ASSIGNED", "IN_PROGRESS"]] },
-            1,
-            0,
-          ],
+      {
+        $group: {
+          _id: "$department",
+          resolved: {
+            $sum: { $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0] },
+          },
+          inProgress: {
+            $sum: {
+              $cond: [{ $in: ["$status", ["ASSIGNED", "IN_PROGRESS"]] }, 1, 0],
+            },
+          },
+          open: {
+            $sum: { $cond: [{ $eq: ["$status", "REPORTED"] }, 1, 0] },
+          },
         },
       },
-      open: {
-        $sum: { $cond: [{ $eq: ["$status", "REPORTED"] }, 1, 0] },
+
+      {
+        $project: {
+          _id: 0,
+          department: "$_id",
+          resolved: 1,
+          inProgress: 1,
+          open: 1,
+          total: { $add: ["$resolved", "$inProgress", "$open"] },
+        },
       },
-    },
-  },
 
-  {
-    $project: {
-      _id: 0,
-      department: "$_id",
-      resolved: 1,
-      inProgress: 1,
-      open: 1,
-      total: { $add: ["$resolved", "$inProgress", "$open"] },
-    },
-  },
+      { $sort: { total: -1 } },
+    ]);
 
-  { $sort: { total: -1 } },
-]);
-
-/* =====================
+    /* =====================
    AUTHORITY PERFORMANCE
 ===================== */
-const authorityPerformance = await Issue.aggregate([
-  { $match: { assignedTo: { $ne: null } } },
+    const authorityPerformance = await Issue.aggregate([
+      { $match: { assignedTo: { $ne: null } } },
 
-  {
-    $lookup: {
-      from: "users",
-      localField: "assignedTo",
-      foreignField: "_id",
-      as: "authority",
-    },
-  },
-  { $unwind: "$authority" },
-
-  {
-    $group: {
-      _id: "$authority._id",
-      name: { $first: "$authority.name" },
-      department: { $first: "$authority.department" },
-
-      assigned: { $sum: 1 },
-
-      resolved: {
-        $sum: { $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0] },
-      },
-
-      totalResolutionMs: {
-        $sum: {
-          $cond: [
-            { $eq: ["$status", "RESOLVED"] },
-            {
-              $subtract: [
-                { $arrayElemAt: ["$statusHistory.changedAt", -1] },
-                { $arrayElemAt: ["$statusHistory.changedAt", 0] },
-              ],
-            },
-            0,
-          ],
+      {
+        $lookup: {
+          from: "users",
+          localField: "assignedTo",
+          foreignField: "_id",
+          as: "authority",
         },
       },
-    },
-  },
+      { $unwind: "$authority" },
 
-  {
-    $project: {
-      authorityName: "$name",
-      department: 1,
-      assigned: 1,
+      {
+        $group: {
+          _id: "$authority._id",
+          name: { $first: "$authority.name" },
+          department: { $first: "$authority.department" },
 
-      resolvedPercent: {
-        $cond: [
-          { $gt: ["$assigned", 0] },
-          { $round: [{ $multiply: [{ $divide: ["$resolved", "$assigned"] }, 100] }, 1] },
-          0,
-        ],
+          assigned: { $sum: 1 },
+
+          resolved: {
+            $sum: { $cond: [{ $eq: ["$status", "RESOLVED"] }, 1, 0] },
+          },
+
+          totalResolutionMs: {
+            $sum: {
+              $cond: [
+                { $eq: ["$status", "RESOLVED"] },
+                {
+                  $subtract: [
+                    { $arrayElemAt: ["$statusHistory.changedAt", -1] },
+                    { $arrayElemAt: ["$statusHistory.changedAt", 0] },
+                  ],
+                },
+                0,
+              ],
+            },
+          },
+        },
       },
 
-      avgResolutionDays: {
-        $cond: [
-          { $gt: ["$resolved", 0] },
-          { $round: [{ $divide: ["$totalResolutionMs", { $multiply: ["$resolved", 86400000] }] }, 1] },
-          0,
-        ],
+      {
+        $project: {
+          authorityName: "$name",
+          department: 1,
+          assigned: 1,
+
+          resolvedPercent: {
+            $cond: [
+              { $gt: ["$assigned", 0] },
+              {
+                $round: [
+                  { $multiply: [{ $divide: ["$resolved", "$assigned"] }, 100] },
+                  1,
+                ],
+              },
+              0,
+            ],
+          },
+
+          avgResolutionDays: {
+            $cond: [
+              { $gt: ["$resolved", 0] },
+              {
+                $round: [
+                  {
+                    $divide: [
+                      "$totalResolutionMs",
+                      { $multiply: ["$resolved", 86400000] },
+                    ],
+                  },
+                  1,
+                ],
+              },
+              0,
+            ],
+          },
+        },
       },
-    },
-  },
 
-  { $sort: { resolvedPercent: -1 } },
-]);
-
+      { $sort: { resolvedPercent: -1 } },
+    ]);
 
     return res.json({
       success: true,
@@ -834,5 +846,123 @@ export const exportDashboardReport = async (req, res) => {
       success: false,
       message: "Failed to export report",
     });
+  }
+};
+
+/* ======================
+   GET SYSTEM SETTINGS
+   GET /api/admin/settings
+====================== */
+export const getSystemSettings = async (req, res) => {
+  try {
+    let settings = await SystemSettings.findOne();
+
+    // Create defaults if not exists (first run)
+    if (!settings) {
+      settings = await SystemSettings.create({});
+    }
+
+    res.json({ success: true, data: settings });
+  } catch (err) {
+    console.error("GET SETTINGS ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+};
+
+/* ======================
+   UPDATE SYSTEM SETTINGS
+   PATCH /api/admin/settings
+====================== */
+export const updateSystemSettings = async (req, res) => {
+  try {
+    const updated = await SystemSettings.findOneAndUpdate(
+      {},
+      { $set: req.body },
+      { new: true, upsert: true },
+    );
+
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    console.error("UPDATE SETTINGS ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+};
+
+/* ======================
+   RESET SETTINGS
+   POST /api/admin/settings/reset
+====================== */
+export const resetSystemSettings = async (req, res) => {
+  try {
+    await SystemSettings.deleteMany({});
+    const defaults = await SystemSettings.create({});
+
+    res.json({ success: true, data: defaults });
+  } catch (err) {
+    console.error("RESET SETTINGS ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+};
+
+/* ======================
+   ADMIN PROFILE
+   GET /api/admin/profile
+====================== */
+// GET /api/admin/profile
+export const getAdminProfile = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      clerkUserId: req.auth.userId,
+      role: "ADMIN",
+    }).select("name email profileImage");
+
+    if (!user) {
+      return res.status(404).json({ success: false });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage,
+      },
+    });
+  } catch (err) {
+    console.error("ADMIN PROFILE ERROR", err);
+    res.status(500).json({ success: false });
+  }
+};
+
+export const updateAdminProfile = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      clerkUserId: req.auth.userId,
+      role: "ADMIN",
+    });
+
+    if (!user) {
+      return res.status(404).json({ success: false });
+    }
+
+    const { name, email, image } = req.body;
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (image) user.profileImage = image;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      data: {
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage,
+      },
+    });
+  } catch (err) {
+    console.error("UPDATE ADMIN PROFILE ERROR", err);
+    res.status(500).json({ success: false });
   }
 };

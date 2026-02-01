@@ -16,7 +16,10 @@ const userSchema = new mongoose.Schema(
       enum: ["CITIZEN", "AUTHORITY", "ADMIN"],
       default: "CITIZEN",
     },
-
+    profileImage: {
+      type: String,
+      default: null,
+    },
 
     department: {
       type: String,

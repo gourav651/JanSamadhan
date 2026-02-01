@@ -16,6 +16,11 @@ import {
   getDashboardAnalytics,
   getAnalyticsInsights,
   exportDashboardReport,
+  getAdminProfile,
+  getSystemSettings,
+  updateSystemSettings,
+  resetSystemSettings,
+  updateAdminProfile,
 } from "../controllers/admin.controller.js";
 import { getAllSupportTickets, updateTicketStatus } from "../controllers/support.controller.js";
 
@@ -57,6 +62,14 @@ router.get("/support/tickets", getAllSupportTickets);
 router.get("/analytics/dashboard",getDashboardAnalytics);
 router.get("/analytics/insights", getAnalyticsInsights);
 router.get("/analytics/export", exportDashboardReport);
+
+router.get("/settings", getSystemSettings);
+router.patch("/settings", updateSystemSettings);
+router.post("/settings/reset", resetSystemSettings);
+
+router.patch("/profile", updateAdminProfile);
+router.get("/profile", getAdminProfile);
+
 
 router.post("/authorities", createAuthority);
 router.patch("/authorities/:id", updateAuthority);
