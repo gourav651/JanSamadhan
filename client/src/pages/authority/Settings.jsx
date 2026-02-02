@@ -9,26 +9,6 @@ const AuthSettings = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
 
-  const [emailNotif, setEmailNotif] = useState(false);
-  const [pushNotif, setPushNotif] = useState(false);
-  const [smsNotif, setSmsNotif] = useState(false);
-
-  const updateNotification = async (updates) => {
-    try {
-      const token = await getToken();
-
-      await axios.patch(
-        "http://localhost:5000/api/authority/settings/notifications",
-        updates,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-    } catch (err) {
-      console.error("Notification update failed", err);
-    }
-  };
-
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -44,9 +24,6 @@ const AuthSettings = () => {
         const data = res.data.data;
 
         setProfile(data);
-        setEmailNotif(data.notificationPrefs.email);
-        setPushNotif(data.notificationPrefs.push);
-        setSmsNotif(data.notificationPrefs.sms);
       } catch (err) {
         console.error("Settings load error", err);
       } finally {
@@ -113,44 +90,50 @@ const AuthSettings = () => {
             </div>
           </section>
 
-          {/* NOTIFICATIONS */}
-          <section className="bg-white rounded-xl border shadow-sm">
-            <h2 className="text-xl font-bold px-6 pt-6 pb-2">
-              Notification Preferences
-            </h2>
+          {/* PLATFORM CONNECTIVITY & API STATUS */}
+          <section className="settings-card bg-white p-6 space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-semibold text-lg">
+                  Platform Connectivity & API Status
+                </h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  Real-time status of critical system integrations and data
+                  pipelines.
+                </p>
+              </div>
 
-            <div className="p-6 flex flex-col gap-4">
-              <ToggleRow
-                icon="mail"
-                title="Email Notifications"
-                desc="Receive detailed daily summaries of new issues"
-                enabled={emailNotif}
-                onToggle={() => {
-                  setEmailNotif((v) => !v);
-                  updateNotification({ email: !emailNotif });
-                }}
+              <span className="material-symbols-outlined text-slate-400">
+                hub
+              </span>
+            </div>
+
+            <div className="divide-y">
+              {/* DATABASE */}
+              <StatusRow
+                icon="storage"
+                title="Database Connectivity"
+                desc="Real-time synchronization with primary citizen database"
+                status="CONNECTED"
+                statusType="success"
               />
 
-              <ToggleRow
-                icon="notifications_active"
-                title="Push Notifications"
-                desc="Real-time alerts for status updates on active issues"
-                enabled={pushNotif}
-                onToggle={() => {
-                  setPushNotif((v) => !v);
-                  updateNotification({ push: !pushNotif });
-                }}
+              {/* EXTERNAL API */}
+              <StatusRow
+                icon="api"
+                title="External API Integrations"
+                desc="Gateway connection to department service endpoints"
+                status="MAINTENANCE"
+                statusType="warning"
               />
 
-              <ToggleRow
-                icon="sms"
-                title="SMS Alerts"
-                desc="Emergency alerts for high-priority civic hazards"
-                enabled={smsNotif}
-                onToggle={() => {
-                  setSmsNotif((v) => !v);
-                  updateNotification({ sms: !smsNotif });
-                }}
+              {/* CLOUD STORAGE */}
+              <StatusRow
+                icon="cloud"
+                title="Cloud Storage Sync"
+                desc="Attachment and document storage redundancy"
+                status="CONNECTED"
+                statusType="success"
               />
             </div>
           </section>
@@ -187,26 +170,33 @@ const ReadonlyField = ({ label, value }) => (
   </div>
 );
 
-const ToggleRow = ({ icon, title, desc, enabled, onToggle }) => (
-  <div className="flex items-center justify-between py-3 border-b last:border-0">
-    <div className="flex items-center gap-4">
-      <div className="bg-primary/10 text-primary p-2 rounded-lg">
-        <span className="material-symbols-outlined">{icon}</span>
-      </div>
-      <div>
-        <p className="font-medium">{title}</p>
-        <p className="text-sm text-gray-500">{desc}</p>
-      </div>
-    </div>
+const StatusRow = ({ icon, title, desc, status, statusType }) => {
+  const statusStyles = {
+    success: "bg-green-100 text-green-700",
+    warning: "bg-yellow-100 text-yellow-700",
+    error: "bg-red-100 text-red-700",
+  };
 
-    <label className="relative inline-flex cursor-pointer">
-      <input
-        type="checkbox"
-        className="sr-only peer"
-        checked={enabled}
-        onChange={onToggle}
-      />
-      <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-primary after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:translate-x-full" />
-    </label>
-  </div>
-);
+  return (
+    <div className="flex items-center justify-between py-4">
+      <div className="flex items-center gap-4">
+        <div className="bg-slate-100 text-slate-700 p-2 rounded-lg">
+          <span className="material-symbols-outlined">{icon}</span>
+        </div>
+
+        <div>
+          <p className="font-medium">{title}</p>
+          <p className="text-sm text-slate-500">{desc}</p>
+        </div>
+      </div>
+
+      <span
+        className={`text-xs font-semibold px-3 py-1 rounded-full ${
+          statusStyles[statusType]
+        }`}
+      >
+        {status}
+      </span>
+    </div>
+  );
+};

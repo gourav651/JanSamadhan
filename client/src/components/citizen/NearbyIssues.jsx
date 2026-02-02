@@ -33,49 +33,66 @@ const NearbyIssues = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl border overflow-y-auto h-full">
-      {nearbyIssues.map((issue) => {
-        const status = getDisplayStatus(issue);
+    <div className="bg-white rounded-xl border h-full flex flex-col">
+      {/* HEADER */}
+      <div className="px-4 py-3 border-b flex items-center justify-between">
+        <h3 className="font-semibold text-slate-800">Nearby Issues</h3>
 
-        return (
-          <div
-            key={issue._id}
-            onClick={() => navigate(`/citizen/issues/${issue._id}`)}
-            className="flex gap-4 p-4 border-b cursor-pointer hover:bg-gray-50"
-          >
-            <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
-              <img
-                src={issue.images?.[0] || "https://via.placeholder.com/100"}
-                className="w-full h-full object-cover"
-              />
-            </div>
+        <button
+          onClick={() => navigate("/citizen/my-issues")}
+          className="text-sm font-medium text-blue-600 cursor-pointer"
+        >
+          View All
+        </button>
+      </div>
 
-            <div className="flex-1">
-              <div className="flex justify-between">
-                <h4 className="font-semibold">{issue.title}</h4>
-                <span
-                  className={`px-2 py-0.5 text-xs rounded-full ${STATUS_STYLES[status]}`}
-                >
-                  {status}
-                </span>
+      {/* LIST */}
+      <div className="flex-1 overflow-y-auto">
+        {nearbyIssues.map((issue) => {
+          const status = getDisplayStatus(issue);
+
+          return (
+            <div
+              key={issue._id}
+              onClick={() => navigate(`/citizen/issues/${issue._id}`)}
+              className="flex gap-4 p-4 border-b cursor-pointer hover:bg-gray-50"
+            >
+              <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
+                <img
+                  src={issue.images?.[0] || "https://via.placeholder.com/100"}
+                  className="w-full h-full object-cover"
+                  alt=""
+                />
               </div>
 
-              <p className="text-sm text-gray-500">
-                {issue.category.replace("_", " ")} · {timeAgo(issue.createdAt)}
-              </p>
+              <div className="flex-1">
+                <div className="flex justify-between items-start gap-2">
+                  <h4 className="font-semibold">{issue.title}</h4>
+                  <span
+                    className={`px-2 py-0.5 text-xs rounded-full ${STATUS_STYLES[status]}`}
+                  >
+                    {status}
+                  </span>
+                </div>
 
-              <p className="text-sm text-gray-700 mt-1 line-clamp-2">
-                {issue.description}
-              </p>
+                <p className="text-sm text-gray-500">
+                  {issue.category.replace("_", " ")} ·{" "}
+                  {timeAgo(issue.createdAt)}
+                </p>
 
-              <div className="flex gap-4 mt-2 text-sm text-gray-600">
-                👍 {issue.upvotes ?? 0}
-                💬 {issue.comments?.length ?? 0}
+                <p className="text-sm text-gray-700 mt-1 line-clamp-2">
+                  {issue.description}
+                </p>
+
+                <div className="flex gap-4 mt-2 text-sm text-gray-600">
+                  👍 {issue.upvotes ?? 0}
+                  💬 {issue.comments?.length ?? 0}
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };

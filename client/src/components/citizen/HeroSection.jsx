@@ -13,7 +13,7 @@ const HeroSection = () => {
         <p className="text-lg text-white/90">
           Report local issues, track progress, and engage with your community authorities in real-time.
         </p>
-        <button onClick={()=>navigate("/citizen/report")} className="text-black text-primary px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+        <button onClick={()=>navigate("/citizen/report")} className="text-black text-primary px-6 py-3 rounded-lg font-bold flex items-center gap-2 cursor-pointer">
           <span className="material-symbols-outlined">add_circle</span>
           Report an Issue Now
         </button>

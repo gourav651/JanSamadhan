@@ -99,7 +99,7 @@ const AdminSettings = () => {
 
     if (!data.secure_url) {
       console.error("Cloudinary upload failed:", data);
-      return; 
+      return;
     }
 
     setProfile((prev) => ({
@@ -266,12 +266,12 @@ const AdminSettings = () => {
           </div>
         </section>
 
-        {/* ROLE & ACCESS */}
+        {/* ROLE & ACCESS (READ ONLY) */}
         <section className="settings-card bg-white">
           <div className="px-6 py-4 border-b">
             <h3 className="font-semibold">Role & Access Control</h3>
             <p className="text-sm text-slate-500">
-              Define what different user levels can see and do
+              Summary of permissions across different user levels
             </p>
           </div>
 
@@ -279,157 +279,208 @@ const AdminSettings = () => {
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
               <tr>
                 <th className="px-6 py-3 text-left">Role</th>
-                <th className="px-6 py-3 text-center">Read</th>
-                <th className="px-6 py-3 text-center">Write</th>
+                <th className="px-6 py-3 text-center">Read Access</th>
+                <th className="px-6 py-3 text-center">Write Access</th>
                 <th className="px-6 py-3 text-center">Analytics</th>
               </tr>
             </thead>
+
             <tbody className="divide-y">
-              <RoleRow
-                role="Admin"
-                desc="Full system access"
-                perms={settings?.rolePermissions?.ADMIN}
-                onChange={(key, value) =>
-                  setSettings({
-                    ...settings,
-                    rolePermissions: {
-                      ...settings.rolePermissions,
-                      ADMIN: {
-                        ...settings.rolePermissions.ADMIN,
-                        [key]: value,
-                      },
-                    },
-                  })
-                }
-              />
+              {/* ADMIN */}
+              <tr>
+                <td className="px-6 py-4">
+                  <p className="font-medium">Admin</p>
+                  <p className="text-sm text-slate-500">
+                    Full system access and configurations
+                  </p>
+                </td>
+                <PermissionCell allowed />
+                <PermissionCell allowed />
+                <PermissionCell allowed />
+              </tr>
 
-              <RoleRow
-                role="Authority"
-                desc="Department issue management"
-                perms={settings?.rolePermissions?.AUTHORITY}
-                onChange={(key, value) =>
-                  setSettings({
-                    ...settings,
-                    rolePermissions: {
-                      ...settings.rolePermissions,
-                      AUTHORITY: {
-                        ...settings.rolePermissions.AUTHORITY,
-                        [key]: value,
-                      },
-                    },
-                  })
-                }
-              />
+              {/* AUTHORITY */}
+              <tr>
+                <td className="px-6 py-4">
+                  <p className="font-medium">Authority</p>
+                  <p className="text-sm text-slate-500">
+                    Department level issue management
+                  </p>
+                </td>
+                <PermissionCell allowed />
+                <PermissionCell allowed />
+                <PermissionCell />
+              </tr>
 
-              <RoleRow
-                role="Citizen"
-                desc="Public reporting only"
-                perms={settings?.rolePermissions?.CITIZEN}
-                onChange={(key, value) =>
-                  setSettings({
-                    ...settings,
-                    rolePermissions: {
-                      ...settings.rolePermissions,
-                      CITIZEN: {
-                        ...settings.rolePermissions.CITIZEN,
-                        [key]: value,
-                      },
-                    },
-                  })
-                }
-              />
+              {/* CITIZEN */}
+              <tr>
+                <td className="px-6 py-4">
+                  <p className="font-medium">Citizen</p>
+                  <p className="text-sm text-slate-500">
+                    Public reporting and tracking only
+                  </p>
+                </td>
+                <PermissionCell allowed />
+                <PermissionCell />
+                <PermissionCell />
+              </tr>
             </tbody>
           </table>
         </section>
 
-        {/* NOTIFICATIONS */}
+        {/* NOTIFICATION & SYSTEM OVERVIEW */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <section className="settings-card bg-white p-6 space-y-6">
-            <h3 className="font-semibold">Notification Settings</h3>
+          {/* Notification Summary */}
+          <section className="settings-card bg-white p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Notification Summary</h3>
+            </div>
 
-            <ToggleRow
+            <NotificationRow
               title="Email Notifications"
-              description="Receive daily summaries and critical alerts"
-              checked={settings?.notifications?.email}
-              onChange={(val) =>
-                setSettings({
-                  ...settings,
-                  notifications: { ...settings.notifications, email: val },
-                })
-              }
+              desc="Daily summaries and alerts"
+              status="ACTIVE"
             />
 
-            <ToggleRow
+            <NotificationRow
               title="SMS Alerts"
-              description="Urgent mobile notifications"
-              checked={false}
+              desc="Urgent mobile notifications"
+              status="DISABLED"
             />
-            <ToggleRow
-              title="Critical System Alerts"
-              description="Override quiet hours for security issues"
-              checked={false}
+
+            <NotificationRow
+              title="System Critical Alerts"
+              desc="Infrastructure health monitoring"
+              status="ACTIVE"
             />
           </section>
 
-          <section className="settings-card bg-white p-6 space-y-4">
-            <h3 className="font-semibold">System Preferences</h3>
-            <Field
-              label="Default SLA Threshold (Hours)"
-              value={settings?.slaHours}
-              type="number"
-              onChange={(e) =>
-                setSettings({ ...settings, slaHours: Number(e.target.value) })
-              }
-            />
+          {/* Platform Statistics */}
+          <section className="settings-card bg-white p-6">
+            <h3 className="font-semibold mb-6">Platform Statistics</h3>
 
-            <select className="w-full border rounded-lg px-3 py-2">
-              <option>Escalate after 24h of inactivity</option>
-            </select>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" defaultChecked />
-              Enable detailed audit logging
-            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <p className="text-3xl font-bold text-blue-600">12.5k</p>
+                <p className="text-sm text-slate-500">Total Registered Users</p>
+              </div>
+
+              <div>
+                <p className="text-3xl font-bold text-slate-900">842</p>
+                <p className="text-sm text-slate-500">Active Reports Today</p>
+              </div>
+
+              <div>
+                <p className="text-3xl font-bold text-slate-900">94%</p>
+                <p className="text-sm text-slate-500">Resolution Rate</p>
+              </div>
+
+              <div>
+                <p className="text-3xl font-bold text-slate-900">15</p>
+                <p className="text-sm text-slate-500">Active Authorities</p>
+              </div>
+            </div>
+          </section>
+
+          {/* System Health */}
+          <section className="settings-card bg-white p-6 space-y-4">
+            <h3 className="font-semibold">System Health</h3>
+
+            <div className="flex gap-6">
+              <HealthBox label="Server Status" value="Optimal" good />
+              <HealthBox label="API Latency" value="124ms" />
+            </div>
+          </section>
+
+          {/* Configuration Defaults */}
+          <section className="settings-card bg-white p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Configuration Defaults</h3>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-slate-500">
+                Default SLA Threshold
+              </p>
+              <p className="font-semibold">48 Hours</p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase text-slate-500">
+                Escalation Protocol
+              </p>
+              <p className="text-sm text-slate-700">
+                Escalate after 24h of inactivity
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-slate-700">
+              <span className="text-green-600">✓</span>
+              Detailed audit logging enabled
+            </div>
           </section>
         </div>
+        {/* PAGE ACTION BAR */}
+        <section className="border-t bg-white py-6 px-8 rounded-lg">
+          <div className="max-w-5xl mx-auto flex justify-between items-center">
+            <button
+              onClick={handleReset}
+              className="text-sm text-slate-500 hover:text-slate-700"
+            >
+              Reset to Defaults
+            </button>
+
+            <div className="flex items-center gap-4">
+              <button className="text-sm text-slate-600">Cancel</button>
+
+              <button
+                onClick={async () => {
+                  if (passwords.newPassword || passwords.confirmPassword) {
+                    if (passwords.newPassword.length < 6) {
+                      alert("Password must be at least 6 characters");
+                      return;
+                    }
+
+                    if (passwords.newPassword !== passwords.confirmPassword) {
+                      alert("Passwords do not match");
+                      return;
+                    }
+
+                    localStorage.setItem(
+                      "admin_ui_password",
+                      passwords.newPassword,
+                    );
+                  }
+
+                  await handleSaveProfile();
+                  await handleSave();
+                  alert("Changes saved successfully");
+                }}
+                className="px-6 py-2 bg-blue-700 text-white rounded-lg font-semibold"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* FOOTER */}
-      <footer className="border-t bg-white py-6 px-8">
-        <div className="max-w-5xl mx-auto flex justify-between">
-          <button onClick={handleReset} className="text-sm text-slate-500">
-            Reset to Defaults
-          </button>
-          <span>
-            <button className="text-sm text-slate-600">Cancel</button>
-            <button
-              onClick={async () => {
-                if (passwords.newPassword || passwords.confirmPassword) {
-                  if (passwords.newPassword.length < 6) {
-                    alert("Password must be at least 6 characters");
-                    return;
-                  }
+      {/* GLOBAL FOOTER */}
+      <footer className="border-t bg-white py-4 px-8">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-slate-500 gap-2">
+          <span>© 2024 JANSAMADHAN Platform. All rights reserved.</span>
 
-                  if (passwords.newPassword !== passwords.confirmPassword) {
-                    alert("Passwords do not match");
-                    return;
-                  }
-
-                  localStorage.setItem(
-                    "admin_ui_password",
-                    passwords.newPassword,
-                  );
-                }
-
-                await handleSaveProfile();
-                await handleSave();
-
-                alert("Changes saved successfully");
-              }}
-              className="px-6 py-2 ml-5 bg-blue-700 text-white rounded-lg font-semibold"
-            >
-              Save Changes
-            </button>
-          </span>
+          <div className="flex gap-4">
+            <a href="#" className="hover:text-slate-700">
+              Privacy Policy
+            </a>
+            <a href="#" className="hover:text-slate-700">
+              Terms of Service
+            </a>
+            <a href="#" className="hover:text-slate-700">
+              Contact Support
+            </a>
+          </div>
         </div>
       </footer>
     </div>
@@ -469,6 +520,55 @@ const RoleRow = ({ role, desc, perms, onChange }) => (
       </td>
     ))}
   </tr>
+);
+
+const PermissionCell = ({ allowed = false }) => (
+  <td className="px-6 py-4 text-center">
+    {allowed ? (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600">
+        ✓
+      </span>
+    ) : (
+      <span className="text-slate-400">—</span>
+    )}
+  </td>
+);
+
+const NotificationRow = ({ title, desc, status }) => (
+  <div className="flex items-center justify-between bg-slate-50 rounded-lg px-4 py-3">
+    <div>
+      <p className="font-medium">{title}</p>
+      <p className="text-sm text-slate-500">{desc}</p>
+    </div>
+
+    <span
+      className={`text-xs font-semibold px-3 py-1 rounded-full ${
+        status === "ACTIVE"
+          ? "bg-green-100 text-green-700"
+          : "bg-slate-200 text-slate-600"
+      }`}
+    >
+      {status}
+    </span>
+  </div>
+);
+
+const StatItem = ({ label, value }) => (
+  <div>
+    <p className="text-2xl font-bold text-blue-600">{value}</p>
+    <p className="text-sm text-slate-500">{label}</p>
+  </div>
+);
+
+const HealthBox = ({ label, value, good }) => (
+  <div className="flex-1 border rounded-lg p-4">
+    <p className="text-xs uppercase text-slate-500">{label}</p>
+    <p
+      className={`font-semibold ${good ? "text-green-600" : "text-slate-800"}`}
+    >
+      {value}
+    </p>
+  </div>
 );
 
 export default AdminSettings;

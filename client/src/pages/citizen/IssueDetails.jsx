@@ -7,6 +7,8 @@ import IssueEvidence from "../../components/issue/IssueEvidence";
 import IssueHeader from "../../components/issue/IssueHeader";
 import IssueSidebar from "../../components/issue/IssueSidebar";
 import IssueTimeline from "../../components/issue/IssueTimeline";
+import CitizenNavbar from "@/components/layout/CitizenNavbar";
+import CitizenFooter from "@/components/layout/CitizenFooter";
 
 const CitizenIssueDetail = () => {
   const { id } = useParams();
@@ -40,31 +42,35 @@ const CitizenIssueDetail = () => {
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-6 text-sm text-gray-500">
-        <button
-          onClick={() => navigate("/citizen/my-issues")}
-          className="cursor-pointer"
-        >
-          ← Back to My Issues
-        </button>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* LEFT */}
-        <div className="lg:col-span-2 space-y-6">
-          <IssueHeader issue={issue} />
-          <IssueEvidence images={issue.images} />
-          <IssueTimeline status={issue.status} />
-          <IssueComments issue={issue} onCommentAdded={fetchIssue} />
+    <>
+      <CitizenNavbar />
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-6 text-sm text-gray-500">
+          <button
+            onClick={() => navigate("/citizen/my-issues")}
+            className="cursor-pointer"
+          >
+            ← Back to My Issues
+          </button>
         </div>
 
-        {/* RIGHT */}
-        <div className="lg:col-span-1 self-start">
-          <IssueSidebar issue={issue} />
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* LEFT */}
+          <div className="lg:col-span-2 space-y-6">
+            <IssueHeader issue={issue} />
+            <IssueEvidence images={issue.images} />
+            <IssueTimeline status={issue.status} createdAt={issue.createdAt} />
+            <IssueComments issue={issue} onCommentAdded={fetchIssue} />
+          </div>
+
+          {/* RIGHT */}
+          <div className="lg:col-span-1 self-start">
+            <IssueSidebar issue={issue} />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+      <CitizenFooter/>
+    </>
   );
 };
 

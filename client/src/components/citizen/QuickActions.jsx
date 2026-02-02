@@ -1,21 +1,28 @@
 const QuickActions = () => {
   return (
     <section className="grid md:grid-cols-3 gap-6">
-      {[
-        { icon: "add_a_photo", title: "Report New Issue" },
-        { icon: "history", title: "View My Activity" },
-        { icon: "category", title: "Explore Categories" }
-      ].map(item => (
-        <div
-          key={item.title}
-          className="bg-white p-6 rounded-xl border hover:shadow cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-primary text-3xl">
-            {item.icon}
-          </span>
-          <h3 className="font-bold mt-3">{item.title}</h3>
-        </div>
-      ))}
+      <div className="bg-white p-6 rounded-xl border">
+        <h3 className="font-semibold text-base">Report Issues</h3>
+        <p className="text-sm text-slate-600 mt-2">
+          Easily report civic issues in your locality with basic details and
+          supporting images.
+        </p>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border">
+        <h3 className="font-semibold text-base">Track Progress</h3>
+        <p className="text-sm text-slate-600 mt-2">
+          Follow the status of your reported issues from submission to
+          resolution.
+        </p>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border">
+        <h3 className="font-semibold text-base">Community Awareness</h3>
+        <p className="text-sm text-slate-600 mt-2">
+          Stay informed about civic concerns across water, roads, and sanitation.
+        </p>
+      </div>
     </section>
   );
 };

@@ -7,6 +7,7 @@ import HeroSection from "../../components/citizen/HeroSection";
 import MapPlaceholder from "../../components/citizen/MapPlaceholder";
 import NearbyIssues from "../../components/citizen/NearbyIssues";
 import QuickActions from "../../components/citizen/QuickActions";
+import CitizenFooter from "@/components/layout/CitizenFooter";
 
 const CitizenHome = () => {
   const { location, loading } = useCurrentLocation();
@@ -18,7 +19,7 @@ const CitizenHome = () => {
     const fetchNearby = async () => {
       try {
         const res = await axios.get(
-          `/api/issues/nearby?lat=${location.lat}&lng=${location.lng}&radius=10000`
+          `/api/issues/nearby?lat=${location.lat}&lng=${location.lng}&radius=10000`,
         );
         setIssues(res.data.issues);
       } catch (error) {
@@ -54,6 +55,7 @@ const CitizenHome = () => {
 
         <QuickActions />
       </main>
+      <CitizenFooter/>
     </>
   );
 };

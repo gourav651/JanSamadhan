@@ -231,20 +231,24 @@ const AuthorityManagement = () => {
 
         {/* ================= TABLE ================= */}
         <div className="bg-white rounded-xl border border-slate-200 overflow-visible">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
             <thead className="bg-slate-50 border-b">
               <tr>
-                <th className="px-6 py-4 text-left font-semibold">
+                <th className="px-6 py-4 w-[28%] text-left font-semibold">
                   Authority Official
                 </th>
-                <th className="px-6 py-4 text-left font-semibold">
+                <th className="px-6 py-4 w-[18%] text-left font-semibold">
                   Department
                 </th>
-                <th className="px-6 py-4 text-left font-semibold">
+                <th className="px-6 py-4 w-[18%] text-left font-semibold">
                   Assigned Area
                 </th>
-                <th className="px-6 py-4 text-left font-semibold">Status</th>
-                <th className="px-6 py-4 text-right font-semibold">Actions</th>
+                <th className="px-6 py-4 w-[18%] text-center font-semibold">
+                  Status
+                </th>
+                <th className="px-6 py-4 w-[18%] text-center font-semibold">
+                  Actions
+                </th>
               </tr>
             </thead>
 
@@ -283,9 +287,9 @@ const AuthorityManagement = () => {
                     </td>
 
                     {/* Status */}
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-center">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        className={`inline-flex justify-center w-28 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                           auth.status === "SUSPENDED"
                             ? "bg-red-50 text-red-700"
                             : auth.status === "ON_LEAVE"
@@ -298,7 +302,7 @@ const AuthorityManagement = () => {
                     </td>
 
                     {/* Actions */}
-                    <td className="px-6 py-4 text-right relative">
+                    <td className="px-6 py-4 text-center relative">
                       <button
                         onClick={() =>
                           setOpenMenuId(
@@ -316,7 +320,7 @@ const AuthorityManagement = () => {
                       {openMenuId === auth._id && (
                         <div
                           ref={menuRef}
-                          className="absolute right-6 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50"
+                          className="absolute right-6 bottom-full mb-2 w-40 bg-white border rounded-lg shadow-lg z-50"
                         >
                           <button
                             onClick={() => openEditModal(auth)}

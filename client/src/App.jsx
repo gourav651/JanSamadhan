@@ -24,12 +24,13 @@ import AdminSettings from "./pages/admin/Settings";
 import AdminSupportTickets from "./pages/admin/AdminSupportTickets";
 
 import PostLoginRedirect from "./components/auth/PostLoginRedirect";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 const App = () => {
   return (
     <>
+      <ScrollToTop/>
       <PostLoginRedirect />
-
       <Routes>
         {/* 🌍 PUBLIC ROUTES */}
         <Route path="/" element={<CitizenHome />} />

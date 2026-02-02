@@ -58,14 +58,14 @@ const AdminSupportTickets = () => {
         ) : tickets.length === 0 ? (
           <div className="p-10 text-slate-500">No support tickets found</div>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
             <thead className="bg-slate-50 border-b">
               <tr>
-                <th className="px-6 py-4 text-left">Title</th>
-                <th className="px-6 py-4 text-left">Raised By</th>
-                <th className="px-6 py-4">Priority</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 text-right">Action</th>
+                <th className="px-6 py-4 w-[30%] text-left">Title</th>
+                <th className="px-6 py-4 w-[20%] text-left">Raised By</th>
+                <th className="px-6 py-4 w-[15%] text-center">Priority</th>
+                <th className="px-6 py-4 w-[15%] text-center">Status</th>
+                <th className="px-6 py-4 w-[20%] text-center">Action</th>
               </tr>
             </thead>
 
@@ -76,13 +76,19 @@ const AdminSupportTickets = () => {
                   <td className="px-6 py-4">
                     {t.raisedBy?.name || t.raisedBy?.email}
                   </td>
-                  <td className="px-6 py-4">{t.priority}</td>
-                  <td className="px-6 py-4">{t.status}</td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-center">{t.priority}</td>
+
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-flex justify-center w-28 px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                      {t.status}
+                    </span>
+                  </td>
+
+                  <td className="px-6 py-4 text-center">
                     <select
                       value={t.status}
                       onChange={(e) => updateStatus(t._id, e.target.value)}
-                      className="border rounded px-2 py-1"
+                      className="border rounded px-2 py-1 w-36 text-sm"
                     >
                       <option value="OPEN">Open</option>
                       <option value="IN_PROGRESS">In Progress</option>
