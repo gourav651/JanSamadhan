@@ -35,22 +35,33 @@ const FitBounds = ({ userLocation, issues }) => {
 
 const MapPlaceholder = ({ userLocation, issues, loading }) => {
   const navigate = useNavigate();
-  
 
   if (loading || !userLocation) {
     return (
-      <div className="h-full bg-gray-100 flex items-center justify-center rounded-xl">
-        Detecting location…
+      <div className="h-full bg-slate-50 flex flex-col items-center justify-center animate-pulse">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-slate-500 font-medium tracking-tight">
+          Locating your neighborhood...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="h-full rounded-xl overflow-hidden border">
+    <div className="h-full w-full relative group">
+      {/* Floating Label overlay */}
+      <div className="absolute top-4 left-4 z-400 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border border-white/20 pointer-events-none">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          Active Zone
+        </p>
+        <p className="text-sm font-bold text-slate-800">Local Area Map</p>
+      </div>
+
       <MapContainer
         center={[userLocation.lat, userLocation.lng]}
         zoom={14}
-        className="h-full w-full"
+        className="h-full w-full z-0"
+        zoomControl={false} // Hide default for cleaner look
       >
         <TileLayer
           attribution="© OpenStreetMap"
@@ -58,22 +69,16 @@ const MapPlaceholder = ({ userLocation, issues, loading }) => {
         />
 
         {/* 📍 User location */}
-<Marker
-  position={[userLocation.lat, userLocation.lng]}
-  icon={userMarkerIcon}
->
-  <Popup>
-    <strong>You are here</strong>
-  </Popup>
-</Marker>
-
-
-        {/* 🔵 CLUSTERED ISSUE MARKERS */}
-        <MarkerClusterGroup
-          chunkedLoading
-          spiderfyOnMaxZoom
-          showCoverageOnHover={false}
+        <Marker
+          position={[userLocation.lat, userLocation.lng]}
+          icon={userMarkerIcon}
         >
+          <Popup className="custom-popup">
+            <strong>You are here</strong>
+          </Popup>
+        </Marker>
+
+        <MarkerClusterGroup chunkedLoading showCoverageOnHover={false}>
           {issues.map((issue) => (
             <Marker
               key={issue._id}
@@ -81,26 +86,30 @@ const MapPlaceholder = ({ userLocation, issues, loading }) => {
                 issue.location.coordinates[1],
                 issue.location.coordinates[0],
               ]}
+              icon={markerIcon}
             >
               <Popup>
                 <div
-                  className="cursor-pointer"
+                  className="p-1 min-w-37.5 cursor-pointer"
                   onClick={() => navigate(`/citizen/issues/${issue._id}`)}
                 >
-                  <strong className="block">{issue.title}</strong>
-                  <span className="text-sm text-gray-600">
-                    {issue.category.replace("_", " ")}
-                  </span>
-                  <p className="text-xs text-blue-600 mt-1">
-                    View details →
+                  <div className="w-full h-20 bg-slate-100 rounded-lg mb-2 overflow-hidden">
+                    <img
+                      src={issue.images?.[0]}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <strong className="block text-slate-800">
+                    {issue.title}
+                  </strong>
+                  <p className="text-xs text-emerald-600 font-bold mt-1">
+                    Details →
                   </p>
                 </div>
               </Popup>
             </Marker>
           ))}
         </MarkerClusterGroup>
-
-        {/* 🔍 Auto zoom */}
         <FitBounds userLocation={userLocation} issues={issues} />
       </MapContainer>
     </div>

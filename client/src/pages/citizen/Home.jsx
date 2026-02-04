@@ -8,6 +8,7 @@ import MapPlaceholder from "../../components/citizen/MapPlaceholder";
 import NearbyIssues from "../../components/citizen/NearbyIssues";
 import QuickActions from "../../components/citizen/QuickActions";
 import CitizenFooter from "@/components/layout/CitizenFooter";
+import HomeServicesSection from "@/components/citizen/HomeServicesSection";
 
 const CitizenHome = () => {
   const { location, loading } = useCurrentLocation();
@@ -32,30 +33,32 @@ const CitizenHome = () => {
 
   return (
     <>
-      <CitizenNavbar />
+      <div className="bg-slate-50/50">
+        <CitizenNavbar />
 
-      <main className="max-w-360 mx-auto px-4 py-6 space-y-6">
-        <HeroSection />
+        <main className="max-w-360 mx-auto px-4 py-6 space-y-6">
+          <HeroSection />
 
-        <div className="grid lg:grid-cols-12 gap-6">
-          {/* 🗺️ MAP */}
-          <div className="relative z-0 lg:col-span-8 h-150">
-            <MapPlaceholder
-              userLocation={location}
-              issues={issues}
-              loading={loading}
-            />
+          <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+            {/* 🗺️ MAP */}
+            <div className="relative lg:col-span-8 h-150 rounded-7xl overflow-hidden shadow-2xl shadow-slate-200 border border-white">
+              <MapPlaceholder
+                userLocation={location}
+                issues={issues}
+                loading={loading}
+              />
+            </div>
+
+            {/* 📋 NEARBY ISSUES */}
+            <div className="lg:col-span-4 h-150 flex flex-col">
+              <NearbyIssues issues={issues} loading={loading} />
+            </div>
           </div>
-
-          {/* 📋 NEARBY ISSUES */}
-          <div className="lg:col-span-4 h-150 overflow-y-hidden">
-            <NearbyIssues issues={issues} loading={loading} />
-          </div>
-        </div>
-
-        <QuickActions />
-      </main>
-      <CitizenFooter/>
+          <HomeServicesSection />
+          <QuickActions />
+        </main>
+      </div>
+      <CitizenFooter />
     </>
   );
 };
