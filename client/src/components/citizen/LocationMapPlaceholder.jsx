@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-lea
 import { useIssue } from "../../context/IssueContext";
 import { markerIcon } from "../../utils/leafletIcon";
 import { useEffect, useState } from "react";
+import { MapPin } from "lucide-react";
 
 /* Keeps map centered on marker */
 const RecenterMap = ({ position }) => {

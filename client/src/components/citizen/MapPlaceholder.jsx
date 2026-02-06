@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { markerIcon } from "../../utils/leafletIcon";
 import { userMarkerIcon } from "../../utils/userMarkerIcon";
+import { useClerk, useUser } from "@clerk/clerk-react";
 
 /* 🔧 Auto-fit bounds when issues change */
 const FitBounds = ({ userLocation, issues }) => {
@@ -35,6 +36,8 @@ const FitBounds = ({ userLocation, issues }) => {
 
 const MapPlaceholder = ({ userLocation, issues, loading }) => {
   const navigate = useNavigate();
+   const { isSignedIn } = useUser();
+  const { openSignIn } = useClerk();
 
   if (loading || !userLocation) {
     return (
@@ -91,7 +94,14 @@ const MapPlaceholder = ({ userLocation, issues, loading }) => {
               <Popup>
                 <div
                   className="p-1 min-w-37.5 cursor-pointer"
-                  onClick={() => navigate(`/citizen/issues/${issue._id}`)}
+                  // onClick={() => navigate(`/citizen/issues/${issue._id}`)}
+                  onClick={() => {
+                if (!isSignedIn) {  
+                  openSignIn(); // 🔐 open login / register
+                  return;
+                }
+                navigate(`/citizen/issues/${issue._id}`); // ✅ allowed
+              }}
                 >
                   <div className="w-full h-20 bg-slate-100 rounded-lg mb-2 overflow-hidden">
                     <img
