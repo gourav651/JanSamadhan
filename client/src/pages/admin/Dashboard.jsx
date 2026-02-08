@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "../../lib/axios";
 import { UserButton, useUser } from "@clerk/clerk-react";
 
@@ -19,6 +19,10 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6"];
+  const [notifications, setNotifications] = useState([]);
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef(null);
 
   const kpis = dashboardData
     ? [
@@ -83,6 +87,25 @@ const AdminDashboard = () => {
       console.error("Export failed", err);
     }
   };
+  useEffect(() => {
+    axios.get("/api/notifications/my").then((res) => {
+      setNotifications(res.data.notifications);
+    });
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(e.target)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="dark bg-background-dark font-display h-full flex flex-col overflow-hidden">
@@ -107,10 +130,94 @@ const AdminDashboard = () => {
           >
             Export Report
           </button>
-          <button className="relative p-2 text-slate-700 hover:text-white rounded-full hover:bg-slate-800">
-            <span className="material-symbols-outlined">notifications logo</span>
-            <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border border-[#0f172a]" />
-          </button>
+
+          <div ref={notificationRef} className="relative">
+            <button
+              onClick={async () => {
+                const willOpen = !showNotifications;
+                setShowNotifications(willOpen);
+
+                // ✅ MARK ALL AS READ WHEN OPENING
+                if (willOpen && unreadCount > 0) {
+                  await axios.patch("/api/notifications/read-all");
+
+                  setNotifications((prev) =>
+                    prev.map((n) => ({ ...n, isRead: true })),
+                  );
+                }
+              }}
+              className="relative p-2 rounded-full hover:bg-blue-400"
+            >
+              <span className="material-symbols-outlined">notifications</span>
+
+              {unreadCount > 0 && (
+                <span
+                  className="absolute -top-1 -right-1 min-w-4.5 h-4.5 px-1
+      bg-red-500 text-white text-[10px] font-bold rounded-full
+      flex items-center justify-center"
+                >
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {showNotifications && (
+              <div className="absolute right-0 top-12 w-88 bg-amber-200 border border-[#282f39] rounded-xl shadow-lg z-50">
+                <div className="px-4 py-3 flex items-center justify-between border-b border-[#282f39]">
+                  <span className="font-semibold text-sm">Notifications</span>
+
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={async () => {
+                        await axios.patch("/api/notifications/read-all");
+
+                        setNotifications((prev) =>
+                          prev.map((n) => ({ ...n, isRead: true })),
+                        );
+                      }}
+                      className="text-xs text-blue-500 hover:underline"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
+
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-sm text-[#9ca8ba]">
+                    No notifications
+                  </div>
+                ) : (
+                  notifications.slice(0, 5).map((n) => (
+                    <div
+                      key={n._id}
+                      onClick={async () => {
+                        // 1️⃣ mark as read in DB
+                        await axios.patch(`/api/notifications/${n._id}/read`);
+
+                        // 2️⃣ update local state
+                        setNotifications((prev) =>
+                          prev.map((x) =>
+                            x._id === n._id ? { ...x, isRead: true } : x,
+                          ),
+                        );
+
+                        // 3️⃣ optional: close dropdown
+                        setShowNotifications(false);
+
+                        // 4️⃣ optional (later): navigate
+                        // if (n.link) navigate(n.link);
+                      }}
+                      className={`px-4 py-3 text-sm cursor-pointer hover:bg-[#2a303b]
+      ${!n.isRead ? "bg-[#243044]" : ""}`}
+                    >
+                      <p className="font-medium">{n.title}</p>
+                      <p className="text-xs text-[#9ca8ba] mt-1">{n.message}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
 
           {isSignedIn && (
             <UserButton
@@ -278,7 +385,8 @@ const AdminDashboard = () => {
           </div>
 
           <footer className="text-xs text-center text-[#9ca8ba] pt-4">
-            © 2024 CivicAdmin Platform. All rights reserved.
+            © {new Date().getFullYear()} CivicAdmin Platform . All rights
+            reserved.
           </footer>
         </div>
       </div>

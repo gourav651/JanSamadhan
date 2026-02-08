@@ -68,6 +68,11 @@ const issueSchema = new mongoose.Schema(
       required: true,
     },
 
+    reportedByClerkId: {
+      type: String,
+      required: true,
+    },
+
     // =========================
     // AUTHORITY FIELDS
     // =========================

@@ -1,6 +1,7 @@
 import Issue from "../models/Issue.js";
 import ActivityLog from "../models/ActivityLog.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 /**
  * GET /api/authority/issues/assigned
@@ -59,7 +60,9 @@ export const getAssignedIssues = async (req, res) => {
  */
 export const getIssueForAuthority = async (req, res) => {
   try {
-    const issue = await Issue.findById(req.params.id);
+    const issue = await Issue.findById(req.params.id)
+      .populate("reportedBy", "name email")
+      .populate("assignedTo", "name department");
 
     if (!issue) {
       return res
@@ -152,6 +155,15 @@ export const updateStatus = async (req, res) => {
     });
 
     await issue.save();
+
+    await Notification.create({
+      userId: issue.reportedByClerkId, // store this in Issue model
+      role: "CITIZEN",
+      title: "Issue Status Updated",
+      message: `Your issue "${issue.title}" is now ${status.replace("_", " ")}`,
+      type: "ISSUE",
+      link: `/citizen/issues/${issue._id}`,
+    });
 
     // 🔟 Activity log (global audit)
     await ActivityLog.create({
@@ -298,7 +310,6 @@ export const getAuthorityMapIssues = async (req, res) => {
   }
 };
 
-
 /**
  * GET /api/authority/settings
  */
@@ -309,9 +320,7 @@ export const getAuthoritySettings = async (req, res) => {
     const authority = await User.findOne({
       clerkUserId,
       role: "AUTHORITY",
-    }).select(
-      "name clerkUserId department assignedArea notificationPrefs",
-    );
+    }).select("name clerkUserId department assignedArea notificationPrefs");
 
     if (!authority) {
       return res.status(404).json({ success: false });
@@ -326,7 +335,6 @@ export const getAuthoritySettings = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
-
 
 /**
  * PATCH /api/authority/settings/notifications
@@ -366,4 +374,3 @@ export const updateAuthorityNotifications = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
-

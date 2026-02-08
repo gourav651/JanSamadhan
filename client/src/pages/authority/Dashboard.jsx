@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
-import axios from "axios";
+import axios from "@/lib/axios";
+import { useRef } from "react";
 
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 
@@ -41,33 +42,45 @@ const AuthDashboard = () => {
 
   const [recentPage, setRecentPage] = useState(1);
   const [recentTotalPages, setRecentTotalPages] = useState(1);
+  const [notifications, setNotifications] = useState([]);
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const token = await getToken();
-
-        const [statsRes, recentRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/authority/dashboard/stats", {
-            headers: { Authorization: `Bearer ${token}` },
+        const [statsRes, recentRes, notifRes] = await Promise.all([
+          axios.get("/api/authority/dashboard/stats"),
+          axios.get("/api/authority/issues/recent", {
+            params: { page: recentPage, limit: 5 },
           }),
-          axios.get("http://localhost:5000/api/authority/issues/recent", {
-            headers: { Authorization: `Bearer ${token}` },
-            params: {
-              page: recentPage,
-              limit: 5,
-            },
-          }),
+          axios.get("/api/notifications/my"),
         ]);
 
         setStats(statsRes.data.data);
         setRecentIssues(recentRes.data.issues);
+        setNotifications(notifRes.data.notifications || []);
       } catch (error) {
         console.error("Failed to load dashboard data", error);
       }
     };
 
     fetchDashboardData();
+  }, [recentPage]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(e.target)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -75,7 +88,8 @@ const AuthDashboard = () => {
       <div className="flex-1 overflow-y-auto flex flex-col">
         {/* HEADER */}
         <header className="bg-white border-b px-8 py-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center justify-between w-full">
+            {/* LEFT */}
             <div>
               <h2 className="text-3xl font-black tracking-tight">
                 Authority Dashboard
@@ -85,8 +99,84 @@ const AuthDashboard = () => {
               </p>
             </div>
 
-            {/* FILTER BAR (UI only) */}
-            
+            {/* RIGHT – NOTIFICATIONS */}
+            <div ref={notificationRef} className="relative">
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+
+                  const willOpen = !showNotifications;
+                  setShowNotifications(willOpen);
+
+                  if (willOpen && unreadCount > 0) {
+                    await axios.patch("/api/notifications/read-all");
+
+                    setNotifications((prev) =>
+                      prev.map((n) => ({ ...n, isRead: true })),
+                    );
+                  }
+                }}
+                className="relative p-2 rounded-full hover:bg-gray-100"
+              >
+                <span className="material-symbols-outlined text-gray-700">
+                  notifications
+                </span>
+
+                {unreadCount > 0 && (
+                  <span
+                    className="
+          absolute -top-1 -right-1
+          min-w-4 h-4 px-1
+          bg-red-500 text-white text-[10px] font-bold
+          rounded-full flex items-center justify-center
+        "
+                  >
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+                {showNotifications && (
+                  <div
+                    className="
+      absolute right-0 mt-3 w-80
+      bg-white border rounded-xl shadow-lg
+      z-50 overflow-hidden
+    "
+                  >
+                    <div className="px-4 py-3 border-b font-bold text-sm">
+                      Notifications
+                    </div>
+
+                    {notifications.length === 0 ? (
+                      <div className="px-4 py-6 text-sm text-gray-500 text-center">
+                        No notifications
+                      </div>
+                    ) : (
+                      <ul className="max-h-80 overflow-y-auto divide-y">
+                        {notifications.map((n) => (
+                          <li
+                            key={n._id}
+                            onClick={() => {
+                              navigate(n.link);
+                              setShowNotifications(false);
+                            }}
+                            className={`
+              px-4 py-3 text-sm cursor-pointer
+              hover:bg-gray-50
+              ${!n.isRead ? "bg-blue-50" : ""}
+            `}
+                          >
+                            <p className="font-semibold">{n.title}</p>
+                            <p className="text-gray-500 text-xs mt-1">
+                              {n.message}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </button>
+            </div>
           </div>
         </header>
 

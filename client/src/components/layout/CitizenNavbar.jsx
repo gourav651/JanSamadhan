@@ -2,6 +2,8 @@ import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Home, AlertCircle, Activity, LogIn } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import axios from "@/lib/axios";
 
 const CitizenNavbar = () => {
   const { isSignedIn } = useUser();
@@ -9,8 +11,33 @@ const CitizenNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [notifications, setNotifications] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
   // Helper to check active route for styling
   const isActive = (path) => location.pathname === path;
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+
+    axios.get("/api/notifications/my").then((res) => {
+      setNotifications(res.data.notifications || []);
+    });
+  }, [isSignedIn]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="sticky top-0 z-1100 w-full px-6 py-3">
@@ -86,6 +113,80 @@ const CitizenNavbar = () => {
 
               {/* Separator */}
               <div className="mx-2 h-6 w-px bg-slate-200" />
+
+              <div ref={dropdownRef} className="relative">
+                <button
+                  onClick={async () => {
+                    const willOpen = !showDropdown;
+                    setShowDropdown(willOpen);
+
+                    // ✅ MARK ALL AS READ WHEN OPENING
+                    if (willOpen && unreadCount > 0) {
+                      await axios.patch("/api/notifications/read-all");
+
+                      setNotifications((prev) =>
+                        prev.map((n) => ({ ...n, isRead: true })),
+                      );
+                    }
+                  }}
+                  className="relative p-2 rounded-full hover:bg-gray-100"
+                >
+                  <span className="material-symbols-outlined">
+                    notifications
+                  </span>
+
+                  {unreadCount > 0 && (
+                    <span
+                      className="absolute -top-1 -right-1 min-w-4 h-4 px-1
+        bg-red-500 text-white text-[10px] font-bold rounded-full
+        flex items-center justify-center"
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* 🔔 DROPDOWN */}
+                {showDropdown && (
+                  <div className="absolute right-0 mt-3 w-80 rounded-xl border bg-white shadow-lg overflow-hidden z-50">
+                    <div className="px-4 py-3 font-bold border-b">
+                      Notifications
+                    </div>
+
+                    {notifications.length === 0 ? (
+                      <div className="px-4 py-6 text-sm text-gray-500 text-center">
+                        No notifications
+                      </div>
+                    ) : (
+                      <ul className="max-h-80 overflow-y-auto">
+                        {notifications.map((n) => (
+                          <li
+                            onClick={async () => {
+                              await axios.patch(
+                                `/api/notifications/${n._id}/read`,
+                              );
+                              setNotifications((prev) =>
+                                prev.map((x) =>
+                                  x._id === n._id ? { ...x, isRead: true } : x,
+                                ),
+                              );
+                              if (n.link) navigate(n.link);
+                              setShowDropdown(false);
+                            }}
+                            className={`px-4 py-3 text-sm cursor-pointer hover:bg-gray-50
+    ${!n.isRead ? "bg-emerald-50" : ""}`}
+                          >
+                            <p className="font-semibold">{n.title}</p>
+                            <p className="text-gray-600 text-xs mt-0.5">
+                              {n.message}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* User Avatar*/}
               <div className="rounded-full border-2 border-emerald-100 bg-transparent p-0.5 transition-transform hover:scale-110 flex items-center justify-center">

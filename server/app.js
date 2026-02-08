@@ -6,6 +6,7 @@ import authorityRoutes from "./routes/authority.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import supportRoutes from "./routes/support.routes.js";
+import notificationRoutes from './routes/notificationRoutes.js';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api/authority", authorityRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/support", supportRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // 🔥 GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {

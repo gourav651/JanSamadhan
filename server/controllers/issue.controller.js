@@ -1,5 +1,6 @@
 import Issue from "../models/Issue.js";
 import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 /**
  * GET NEARBY ISSUES
@@ -45,7 +46,9 @@ export const createIssue = async (req, res) => {
 
     const user = await User.findOne({ clerkUserId });
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     // 🔥 CRITICAL FIX
@@ -60,14 +63,12 @@ export const createIssue = async (req, res) => {
 
       location: {
         type: "Point",
-        coordinates: [
-          Number(location.lng),
-          Number(location.lat),
-        ],
+        coordinates: [Number(location.lng), Number(location.lat)],
         address: location.address,
       },
 
       reportedBy: user._id,
+      reportedByClerkId: clerkUserId, //added this
 
       status: "REPORTED",
       priority: "NORMAL",
@@ -80,15 +81,27 @@ export const createIssue = async (req, res) => {
       ],
     });
 
+    // 🔔 NOTIFY ALL ADMINS ABOUT NEW ISSUE
+    const admins = await User.find({ role: "ADMIN" });
+
+    const adminNotifications = admins.map((admin) => ({
+      userId: admin.clerkUserId,
+      role: "ADMIN",
+      title: "New Issue Reported",
+      message: `A new issue "${issue.title}" has been reported.`,
+      type: "ISSUE",
+      link: `/admin/issues/${issue._id}`,
+    }));
+
+    await Notification.insertMany(adminNotifications);
+
     res.status(201).json({ success: true, issue });
+    
   } catch (err) {
     console.error("CREATE ISSUE ERROR:", err);
     res.status(500).json({ success: false });
   }
 };
-
-
-
 
 /**
  * GET ISSUE BY ID

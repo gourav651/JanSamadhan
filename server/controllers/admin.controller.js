@@ -2,6 +2,7 @@ import Issue from "../models/Issue.js";
 import User from "../models/User.js";
 import SystemSettings from "../models/SystemSettings.js";
 import cloudinary from "../config/cloudinary.js";
+import Notification from "../models/Notification.js";
 
 /* =====================
    DASHBOARD STATS
@@ -220,6 +221,16 @@ export const assignIssueToAuthority = async (req, res) => {
     });
 
     await issue.save();
+
+    // ✅ 4️⃣ CREATE NOTIFICATION
+    await Notification.create({
+      userId: authority.clerkUserId,
+      role: "AUTHORITY",
+      title: "New Issue Assigned",
+      message: "A new issue has been assigned to your department.",
+      type: "ISSUE",
+      link: `/authority/issues/${issue._id}`,
+    });
 
     return res.json({
       success: true,
