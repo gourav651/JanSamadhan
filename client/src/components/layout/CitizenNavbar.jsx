@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 import { Home, AlertCircle, Activity, LogIn } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import axios from "@/lib/axios";
+import socket from "@/lib/socket";
 
 const CitizenNavbar = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const { openSignIn } = useClerk();
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,6 +20,24 @@ const CitizenNavbar = () => {
 
   // Helper to check active route for styling
   const isActive = (path) => location.pathname === path;
+
+  useEffect(() => {
+    if (!isSignedIn || !user) return;
+
+    socket.emit("join", { userId: user.id });
+
+    return () => {
+      socket.off("notification");
+    };
+  }, [isSignedIn, user]);
+
+  useEffect(() => {
+    socket.on("notification", (data) => {
+      setNotifications((prev) => [data, ...prev]);
+    });
+
+    return () => socket.off("notification");
+  }, []);
 
   useEffect(() => {
     if (!isSignedIn) return;

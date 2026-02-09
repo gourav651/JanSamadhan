@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import axios from "@/lib/axios";
 import { useRef } from "react";
+import socket from "@/lib/socket";
 
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 
@@ -35,6 +36,7 @@ const stats = [
 ];
 
 const AuthDashboard = () => {
+  const { user } = useUser();
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const [stats, setStats] = useState(null);
@@ -82,6 +84,29 @@ const AuthDashboard = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    socket.emit("join", { userId: user.id });
+
+    socket.on("notification", (data) => {
+      setNotifications((prev) => [
+        {
+          _id: crypto.randomUUID(),
+          title: data.title,
+          message: data.message,
+          link: data.link,
+          isRead: false,
+        },
+        ...prev,
+      ]);
+    });
+
+    return () => {
+      socket.off("notification");
+    };
+  }, [user]);
 
   return (
     <AuthorityLayout>

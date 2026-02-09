@@ -2,6 +2,7 @@ import Issue from "../models/Issue.js";
 import ActivityLog from "../models/ActivityLog.js";
 import User from "../models/User.js";
 import Notification from "../models/Notification.js";
+import { io } from "../server.js";
 
 /**
  * GET /api/authority/issues/assigned
@@ -87,7 +88,7 @@ export const updateStatus = async (req, res) => {
     const { status, resolutionNotes } = req.body;
 
     // 2️⃣ Validate status
-    const allowedStatuses = ["OPEN", "IN_PROGRESS", "RESOLVED"];
+    const allowedStatuses = ["ASSIGNED", "IN_PROGRESS", "RESOLVED"];
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -163,6 +164,14 @@ export const updateStatus = async (req, res) => {
       message: `Your issue "${issue.title}" is now ${status.replace("_", " ")}`,
       type: "ISSUE",
       link: `/citizen/issues/${issue._id}`,
+    });
+
+    io.to(issue.reportedByClerkId).emit("notification", {
+      title: "Issue Status Updated",
+      message: `Your issue "${issue.title}" is now ${status.replace("_", " ")}`,
+      link: `/citizen/issues/${issue._id}`,
+      isRead: false,
+      createdAt: new Date(),
     });
 
     // 🔟 Activity log (global audit)

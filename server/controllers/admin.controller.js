@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import SystemSettings from "../models/SystemSettings.js";
 import cloudinary from "../config/cloudinary.js";
 import Notification from "../models/Notification.js";
+import { io } from "../server.js";
 
 /* =====================
    DASHBOARD STATS
@@ -229,6 +230,12 @@ export const assignIssueToAuthority = async (req, res) => {
       title: "New Issue Assigned",
       message: "A new issue has been assigned to your department.",
       type: "ISSUE",
+      link: `/authority/issues/${issue._id}`,
+    });
+
+    io.to(authority.clerkUserId).emit("notification", {
+      title: "New Issue Assigned",
+      message: "A new issue has been assigned to your department.",
       link: `/authority/issues/${issue._id}`,
     });
 
@@ -557,7 +564,7 @@ export const getDashboardAnalytics = async (req, res) => {
  */
 export const getAnalyticsInsights = async (req, res) => {
   try {
-    const { from, to, severity, district, department } = req.query;
+    const { from, to, priority, district, department } = req.query;
 
     const matchStage = {};
 
@@ -567,8 +574,8 @@ export const getAnalyticsInsights = async (req, res) => {
       if (to) matchStage.createdAt.$lte = new Date(to);
     }
 
-    if (severity && severity !== "ALL") {
-      matchStage.severity = severity;
+    if (priority && priority !== "ALL") {
+      matchStage.priority = priority;
     }
 
     if (district && district !== "ALL") {
@@ -614,7 +621,7 @@ export const getAnalyticsInsights = async (req, res) => {
 
     const criticalBacklog = await Issue.countDocuments({
       ...matchStage,
-      severity: { $in: ["HIGH", "CRITICAL"] },
+      priority: "HIGH",
       status: { $ne: "RESOLVED" },
     });
 

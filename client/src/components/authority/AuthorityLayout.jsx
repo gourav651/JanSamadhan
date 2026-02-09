@@ -1,13 +1,34 @@
 import { NavLink } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useUser, useClerk } from "@clerk/clerk-react";
+import socket from "@/lib/socket";
 
 const AuthorityLayout = ({ children }) => {
-  const { user } = useUser();
+  const { user,isSignedIn } = useUser();
   const { signOut } = useClerk();
 
+  const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
   const accountRef = useRef(null);
+
+  useEffect(() => {
+  if (!isSignedIn || !user) return;
+
+  socket.connect();
+  socket.emit("join", { userId: user.id });
+
+  return () => {
+    socket.disconnect();
+  };
+}, [isSignedIn, user]);
+
+useEffect(() => {
+  socket.on("notification", (data) => {
+    setNotifications((prev) => [data, ...prev]);
+  });
+
+  return () => socket.off("notification");
+}, []);
 
   // 🔹 Close logout on outside click
   useEffect(() => {

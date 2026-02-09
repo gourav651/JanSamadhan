@@ -1,6 +1,7 @@
 import Issue from "../models/Issue.js";
 import User from "../models/User.js";
 import Notification from "../models/Notification.js";
+import { io } from "../server.js";
 
 /**
  * GET NEARBY ISSUES
@@ -95,8 +96,28 @@ export const createIssue = async (req, res) => {
 
     await Notification.insertMany(adminNotifications);
 
+    // 🔥 REAL-TIME SOCKET NOTIFICATION TO ADMINS
+    // 🔥 REAL-TIME SOCKET NOTIFICATION TO ADMINS
+    admins.forEach((admin) => {
+      io.to(admin.clerkUserId).emit("notification", {
+        title: "New Issue Reported",
+        message: `A new issue "${issue.title}" has been reported.`,
+        link: `/admin/issues/${issue._id}`,
+        isRead: false,
+        createdAt: new Date(),
+      });
+    });
+
+    // 🔥 REAL-TIME SOCKET NOTIFICATION TO CITIZEN (✅ MUST BE HERE)
+    io.to(clerkUserId).emit("notification", {
+      title: "Issue Reported",
+      message: "Your issue has been successfully reported.",
+      link: `/citizen/issues/${issue._id}`,
+      isRead: false,
+      createdAt: new Date(),
+    });
+
     res.status(201).json({ success: true, issue });
-    
   } catch (err) {
     console.error("CREATE ISSUE ERROR:", err);
     res.status(500).json({ success: false });

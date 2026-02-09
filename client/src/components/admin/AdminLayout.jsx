@@ -1,13 +1,15 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useClerk, useUser } from "@clerk/clerk-react";
 import { useState, useRef, useEffect } from "react";
+import socket from "@/lib/socket";
 
 const AdminLayout = () => {
   const { signOut } = useClerk();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
 
   const [showLogout, setShowLogout] = useState(false);
   const profileRef = useRef(null);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -18,6 +20,25 @@ const AdminLayout = () => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!isSignedIn || !user) return;
+
+    socket.connect();
+    socket.emit("join", { userId: user.id });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [isSignedIn, user]);
+
+  useEffect(() => {
+    socket.on("notification", (data) => {
+      setNotifications((prev) => [data, ...prev]);
+    });
+
+    return () => socket.off("notification");
   }, []);
 
   return (
