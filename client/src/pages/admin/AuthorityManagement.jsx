@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { fetchAuthorities } from "../../services/adminApi";
 import axios from "../../lib/axios";
-
 const AuthorityManagement = () => {
   const [authorities, setAuthorities] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null); // 👈 which row menu is open

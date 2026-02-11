@@ -16,6 +16,10 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { fetchIssueById } from "../../services/adminApi";
+import { X } from "lucide-react";
+import { ShieldCheck, ChevronDown, UserPlus } from "lucide-react";
+import { Search } from "lucide-react";
+import { Info } from "lucide-react";
 
 const TIMELINE_STEPS = ["REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED"];
 
@@ -123,15 +127,17 @@ const AdminIssues = () => {
   };
 
   return (
-    <div className="dark bg-background-dark text-slate-100 h-full flex overflow-hidden font-display">
+    <div className="dark bg-[#030712] text-slate-200 h-full flex overflow-hidden font-display">
       {/* ================= MAIN CONTENT ================= */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-background-dark">
-        {/* ================= HEADER ================= */}
-        <header className="h-16 flex items-center justify-between px-6 border-b border-slate-800 shrink-0 bg-background-dark/80 backdrop-blur-md z-20">
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+        {/* Header Update */}
+        <header className="h-16 flex items-center justify-between px-6 border-b border-slate-800/50 bg-[#030712]/80 backdrop-blur-md z-20">
           <div className="flex items-center gap-4">
-            <h2 className="text-black font-bold">Issues Management</h2>
+            <h2 className="text-white text-xl font-bold tracking-tight">
+              Issues Management
+            </h2>
             <div className="h-4 w-px bg-slate-800" />
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
               Global Oversight
             </span>
           </div>
@@ -144,9 +150,11 @@ const AdminIssues = () => {
             {/* Filters */}
             <div className="p-4 border-b border-slate-800 flex flex-wrap items-center gap-3">
               <div className="flex-1 min-w-75 relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
-                  search
-                </span>
+                <Search
+                  size={18}
+                  strokeWidth={2}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors duration-200"
+                />
                 <input
                   value={search}
                   onChange={(e) => {
@@ -244,21 +252,23 @@ const AdminIssues = () => {
             {/* Table */}
             <div className="flex-1 overflow-auto">
               <table className="w-full min-w-250 text-left border-collapse">
-                <thead className="sticky top-0 bg-[#0f172a] border-b border-slate-800 z-10">
+                {/* Table Header */}
+                {/* Table Header */}
+                <thead className="sticky top-0 bg-[#030712] border-b border-slate-800 z-10">
                   <tr>
                     {[
                       "Issue ID",
                       "Type",
                       "Category",
                       "Location",
-                      "Assigned Authority",
+                      "Assigned To",
                       "Priority",
                       "Status",
                       "Date",
                     ].map((h) => (
                       <th
                         key={h}
-                        className="px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                        className="px-4 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest"
                       >
                         {h}
                       </th>
@@ -284,23 +294,25 @@ const AdminIssues = () => {
                           setLoadingIssue(false);
                         }
                       }}
-                      className="issue-table-row cursor-pointer bg-white/5 hover:bg-slate-800/50 transition"
+                      className="group border-b border-slate-800/40 hover:bg-blue-600/4 transition-all cursor-pointer"
                     >
-                      <td className="px-4 py-4 text-sm font-mono font-bold text-black">
+                      <td className="px-4 py-4 text-sm font-mono font-bold text-blue-400">
                         {issue._id?.slice(-6)}
                       </td>
 
                       <td className="px-4 py-4">
-                        <span className="material-symbols-outlined text-blue-900">
-                          warning
-                        </span>
+                        <div className="p-2 rounded-lg bg-slate-800/40 w-fit">
+                          <span className="material-symbols-outlined text-blue-400 text-lg">
+                            warning
+                          </span>
+                        </div>
                       </td>
 
-                      <td className="px-4 py-4 text-sm text-slate-600">
+                      <td className="px-4 py-4 text-sm text-slate-300 font-medium">
                         {issue.category || "General"}
                       </td>
 
-                      <td className="px-4 py-4 text-sm text-slate-600">
+                      <td className="px-4 py-4 text-sm text-slate-400 max-w-50 truncate">
                         {issue.location?.address || "N/A"}
                       </td>
 
@@ -360,126 +372,210 @@ const AdminIssues = () => {
           </div>
 
           {/* ================= RIGHT DETAILS PANEL ================= */}
-          <div className="w-100 border-l border-slate-800 flex flex-col bg-panel-dark shadow-2xl">
-            <div className="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
-              <div className="flex-1 flex flex-col justify-center">
-                {loadingIssue ? (
-                  <p className="text-slate-400">Loading issue...</p>
-                ) : activeIssue ? (
-                  <>
-                    {/* Issue Images */}
-                    <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="w-105 border-l border-slate-800/60 flex flex-col bg-[#0b1120] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] z-30">
+            {activeIssue ? (
+              <>
+                {/* Panel Header */}
+                <div className="p-6 border-b border-slate-800/50 flex items-center justify-between bg-slate-900/20">
+                  <div>
+                    <h3 className="text-white font-bold text-lg tracking-tight">
+                      Issue Details
+                    </h3>
+                    <p className="text-[10px] text-blue-400 font-mono uppercase tracking-widest mt-0.5">
+                      ID: #{activeIssue._id?.slice(-8)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveIssue(null)}
+                    className="group relative h-9 w-9 rounded-xl flex items-center justify-center 
+             bg-slate-900/50 border border-slate-800/60 
+             hover:bg-red-500/10 hover:border-red-500/40 
+             transition-all duration-300 shadow-xl"
+                    aria-label="Close"
+                  >
+                    {/* Hover Glow Effect */}
+                    <div
+                      className="absolute inset-0 rounded-xl bg-red-500/20 blur-lg 
+                  opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                    />
+
+                    {/* Lucide X Icon */}
+                    <X
+                      size={18}
+                      strokeWidth={2.5}
+                      className="text-slate-400 group-hover:text-red-400 group-hover:rotate-90 
+               transition-all duration-300 z-10"
+                    />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+                  {/* Visual Assets Section */}
+                  <section>
+                    <div className="grid grid-cols-2 gap-3">
                       {activeIssue.images?.map((img, i) => (
-                        <img
+                        <div
                           key={i}
-                          src={img}
-                          className="rounded-lg object-cover h-28 w-full"
-                        />
+                          className="group relative rounded-xl overflow-hidden border border-slate-800 bg-slate-900 h-32"
+                        >
+                          <img
+                            src={img}
+                            className="object-cover h-full w-full group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                            <span className="text-[10px] text-white font-medium">
+                              View Fullscreen
+                            </span>
+                          </div>
+                        </div>
                       ))}
                     </div>
+                  </section>
 
-                    {/* Description */}
-                    <p className="text-sm text-slate-300 mb-4">
-                      {activeIssue.description}
+                  {/* Description Card */}
+                  <section className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-5">
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-3">
+                      Citizen Description
+                    </h4>
+                    <p className="text-sm text-slate-300 leading-relaxed italic">
+                      "{activeIssue.description}"
                     </p>
+                  </section>
 
-                    {/* ================= PROGRESS TIMELINE ================= */}
-                    <div className="mt-6">
-                      <h4 className="text-sm font-semibold text-slate-300 mb-4">
-                        Progress Timeline
-                      </h4>
+                  {/* ================= PROGRESS TIMELINE (THE STAR ELEMENT) ================= */}
+                  <section>
+                    <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-6">
+                      Resolution Progress
+                    </h4>
+                    <div className="space-y-0">
+                      {getTimelineData(activeIssue).map((step, index) => {
+                        const currentIndex = TIMELINE_STEPS.indexOf(
+                          activeIssue.status,
+                        );
+                        const stepIndex = TIMELINE_STEPS.indexOf(step.status);
+                        const completed = stepIndex <= currentIndex;
+                        const isCurrent = stepIndex === currentIndex;
 
-                      <div className="space-y-4">
-                        {getTimelineData(activeIssue).map((step, index) => {
-                          const currentIndex = TIMELINE_STEPS.indexOf(
-                            activeIssue.status,
-                          );
-                          const stepIndex = TIMELINE_STEPS.indexOf(step.status);
-
-                          const completed = stepIndex <= currentIndex;
-                          const hasHistory = Boolean(step.data);
-
-                          return (
-                            <div
-                              key={step.status}
-                              className="flex items-start gap-3"
-                            >
-                              {/* Dot */}
-                              <div className="flex flex-col items-center">
+                        return (
+                          <div key={step.status} className="flex gap-4 group">
+                            <div className="flex flex-col items-center">
+                              <div
+                                className={`relative h-4 w-4 rounded-full border-2 transition-all duration-500 z-10 
+                      ${completed ? "bg-blue-500 border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.6)]" : "border-slate-700 bg-slate-900"}
+                      ${isCurrent ? "ring-4 ring-blue-500/20" : ""}`}
+                              />
+                              {index !== 3 && (
                                 <div
-                                  className={`h-3 w-3 rounded-full ${
-                                    completed ? "bg-primary" : "bg-slate-400"
-                                  }`}
+                                  className={`w-0.5 h-12 transition-colors duration-500 ${completed ? "bg-blue-500/50" : "bg-slate-800"}`}
                                 />
-
-                                {index !== TIMELINE_STEPS.length - 1 && (
-                                  <div className="h-8 w-px bg-slate-700 mt-1" />
-                                )}
-                              </div>
-
-                              {/* Content */}
-                              <div>
-                                <p
-                                  className={`text-sm font-medium ${
-                                    completed
-                                      ? "text-slate-800"
-                                      : "text-slate-400"
-                                  }`}
-                                >
-                                  {step.status.replace("_", " ")}
-                                </p>
-
-                                {hasHistory ? (
-                                  <p className="text-xs text-slate-500 mt-0.5">
-                                    {new Date(
-                                      step.data.changedAt,
-                                    ).toLocaleString()}
-                                  </p>
-                                ) : completed ? (
-                                  <p className="text-xs text-slate-400 mt-0.5">
-                                    —
-                                  </p>
-                                ) : (
-                                  <p className="text-xs text-slate-400 mt-0.5">
-                                    Not yet
-                                  </p>
-                                )}
-                              </div>
+                              )}
                             </div>
-                          );
-                        })}
-                      </div>
+                            <div className="pb-8">
+                              <p
+                                className={`text-sm font-bold tracking-tight transition-colors ${completed ? "text-slate-100" : "text-slate-500"}`}
+                              >
+                                {step.status.replace("_", " ")}
+                              </p>
+                              <p className="text-[11px] text-slate-500 mt-1 font-medium">
+                                {step.data
+                                  ? new Date(
+                                      step.data.changedAt,
+                                    ).toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })
+                                  : completed
+                                    ? "Verified"
+                                    : "Waiting for action..."}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  </>
-                ) : (
-                  <p className="text-slate-500">
-                    Select an issue to view details
-                  </p>
-                )}
+                  </section>
+                </div>
+
+                {/* ================= ACTION FOOTER ================= */}
+                <div className="p-6 bg-slate-900/40 border-t border-slate-800/60 backdrop-blur-xl space-y-4">
+                  {/* Header with Icon */}
+                  <div className="flex items-center gap-2 mb-1">
+                    <ShieldCheck size={14} className="text-blue-400" />
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] block">
+                      Administrative Assignment
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    {/* Custom Dropdown Container */}
+                    <div className="relative group">
+                      <select
+                        value={selectedAuthority}
+                        onChange={(e) => setSelectedAuthority(e.target.value)}
+                        className="w-full bg-[#030712] border border-slate-700/80 rounded-xl py-3.5 pl-4 pr-10 text-sm text-slate-200 appearance-none 
+                   focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition-all cursor-pointer
+                   hover:border-slate-600"
+                      >
+                        <option value="" className="bg-[#030712]">
+                          Select Department...
+                        </option>
+                        {authorities.map((auth) => (
+                          <option
+                            key={auth._id}
+                            value={auth._id}
+                            className="bg-[#030712]"
+                          >
+                            {auth.name || auth.email}
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Lucide replacement for unfold_more */}
+                      <ChevronDown
+                        size={18}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none group-hover:text-slate-300 transition-colors"
+                      />
+                    </div>
+
+                    {/* Assign Button with Lucide Icon */}
+                    <button
+                      onClick={handleAssign}
+                      disabled={!selectedAuthority}
+                      className="w-full group relative overflow-hidden bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl text-sm font-bold transition-all 
+                 shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]
+                 disabled:opacity-20 disabled:grayscale disabled:cursor-not-allowed"
+                    >
+                      <div className="relative z-10 flex items-center justify-center gap-2 cursor-pointer">
+                        <UserPlus size={18} strokeWidth={2.5} />
+                        <span>Assign Authority</span>
+                      </div>
+
+                      {/* Premium Shimmer Effect */}
+                      <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_2s_infinite]" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                <div className="relative h-20 w-20 rounded-2xl bg-[#030712] border border-slate-800 flex items-center justify-center shadow-2xl">
+                  <Info
+                    size={40}
+                    strokeWidth={1.5}
+                    className="text-slate-600 animate-pulse"
+                  />
+                </div>
+                <h3 className="text-slate-400 font-medium">
+                  No Issue Selected
+                </h3>
+                <p className="text-sm text-slate-600 mt-2">
+                  Pick an item from the list to view its timeline and management
+                  options.
+                </p>
               </div>
-
-              <select
-                value={selectedAuthority}
-                onChange={(e) => setSelectedAuthority(e.target.value)}
-                disabled={!selectedIssue}
-                className="w-full mb-3 bg-slate-900 border border-slate-700 rounded-lg py-2 px-3 text-sm text-slate-300"
-              >
-                <option value="">Select Authority</option>
-                {authorities.map((auth) => (
-                  <option key={auth._id} value={auth._id}>
-                    {auth.name || auth.email}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                disabled={!selectedIssue}
-                onClick={handleAssign}
-                className="w-full text-black bg-primary hover:bg-primary/90 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 disabled:opacity-50"
-              >
-                Assign Authority
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </div>
