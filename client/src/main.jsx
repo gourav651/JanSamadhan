@@ -6,6 +6,7 @@ import { IssueProvider } from "./context/IssueContext.jsx";
 import { ClerkProvider } from "@clerk/clerk-react";
 import "leaflet/dist/leaflet.css";
 import "./index.css";
+import SocketProvider from "./providers/SocketProvider.jsx";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -15,12 +16,14 @@ if (!PUBLISHABLE_KEY) {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <IssueProvider>
-        <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-          <App />
-        </ClerkProvider>
-      </IssueProvider>
-    </BrowserRouter>
-  </StrictMode>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <SocketProvider>
+        <BrowserRouter>
+          <IssueProvider>
+            <App />
+          </IssueProvider>
+        </BrowserRouter>
+      </SocketProvider>
+    </ClerkProvider>
+  </StrictMode>,
 );

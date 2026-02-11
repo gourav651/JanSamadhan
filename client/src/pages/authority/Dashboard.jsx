@@ -88,7 +88,6 @@ const AuthDashboard = () => {
   useEffect(() => {
     if (!user?.id) return;
 
-    socket.emit("join", { userId: user.id });
 
     socket.on("notification", (data) => {
       setNotifications((prev) => [

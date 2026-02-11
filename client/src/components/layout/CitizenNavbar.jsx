@@ -5,6 +5,7 @@ import { Home, AlertCircle, Activity, LogIn } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import axios from "@/lib/axios";
 import socket from "@/lib/socket";
+import { Bell } from "lucide-react";
 
 const CitizenNavbar = () => {
   const { isSignedIn, user } = useUser();
@@ -20,16 +21,6 @@ const CitizenNavbar = () => {
 
   // Helper to check active route for styling
   const isActive = (path) => location.pathname === path;
-
-  useEffect(() => {
-    if (!isSignedIn || !user) return;
-
-    socket.emit("join", { userId: user.id });
-
-    return () => {
-      socket.off("notification");
-    };
-  }, [isSignedIn, user]);
 
   useEffect(() => {
     socket.on("notification", (data) => {
@@ -148,11 +139,12 @@ const CitizenNavbar = () => {
                       );
                     }
                   }}
-                  className="relative p-2 rounded-full hover:bg-gray-100"
+                  className="relative p-2 rounded-full hover:bg-gray-100 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined">
-                    notifications
-                  </span>
+                  <Bell
+                    size={24}
+                    className="group-hover:rotate-15 transition-transform duration-300"
+                  />
 
                   {unreadCount > 0 && (
                     <span

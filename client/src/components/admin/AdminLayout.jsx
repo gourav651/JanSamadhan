@@ -23,17 +23,6 @@ const AdminLayout = () => {
   }, []);
 
   useEffect(() => {
-    if (!isSignedIn || !user) return;
-
-    socket.connect();
-    socket.emit("join", { userId: user.id });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [isSignedIn, user]);
-
-  useEffect(() => {
     socket.on("notification", (data) => {
       setNotifications((prev) => [data, ...prev]);
     });
