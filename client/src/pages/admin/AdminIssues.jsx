@@ -116,7 +116,7 @@ const AdminIssues = () => {
 
     issue.statusHistory.forEach((h) => {
       if (!historyMap[h.status]) {
-        historyMap[h.status] = h; // keep first occurrence only
+        historyMap[h.status] = h;
       }
     });
 
@@ -235,13 +235,13 @@ const AdminIssues = () => {
 
                   <PopoverContent className="w-auto p-0 bg-slate-900 border border-slate-700">
                     <Calendar
-                      mode="range" // 🔑 DIFFERENCE
-                      selected={dateRange} // 🔑 DIFFERENCE
+                      mode="range"
+                      selected={dateRange}
                       onSelect={(range) => {
                         setDateRange(range ?? undefined);
                       }}
                       numberOfMonths={2}
-                      captionLayout="dropdown" // (month + year dropdown like your screenshot)
+                      captionLayout="dropdown"
                       className="rounded-md"
                     />
                   </PopoverContent>
@@ -578,6 +578,10 @@ const AdminIssues = () => {
             )}
           </div>
         </div>
+        <footer className="text-xs text-center text-[#9ca8ba] p-4">
+          © {new Date().getFullYear()} JanSamadhan Platform. All rights
+          reserved.
+        </footer>
       </div>
     </div>
   );

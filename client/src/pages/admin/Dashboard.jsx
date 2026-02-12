@@ -390,10 +390,9 @@ const AdminDashboard = () => {
         </div>
 
         <footer className="text-xs text-center text-[#9ca8ba] pt-4">
-          © {new Date().getFullYear()} CivicAdmin Platform . All rights
+          © {new Date().getFullYear()} JanSamadhan Platform . All rights
           reserved.
         </footer>
-        {/* </div> */}
       </div>
     </div>
   );
