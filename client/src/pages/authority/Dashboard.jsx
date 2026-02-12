@@ -1,53 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, useUser } from "@clerk/clerk-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Bell,
+  ChevronRight,
+  Activity,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  User,
+} from "lucide-react";
 import axios from "@/lib/axios";
-import { useRef } from "react";
 import socket from "@/lib/socket";
 
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 
-const stats = [
-  {
-    label: "Total Open Issues",
-    value: 124,
-    sub: "+12% from last week",
-    color: "red",
-  },
-  {
-    label: "In Progress",
-    value: 45,
-    sub: "8 tickets added today",
-    color: "amber",
-  },
-  {
-    label: "Resolved",
-    value: 892,
-    sub: "98% success rate",
-    color: "green",
-  },
-  {
-    label: "Assigned to Me",
-    value: 12,
-    sub: "3 high priority tasks",
-    color: "primary",
-    clickable: true,
-  },
-];
-
 const AuthDashboard = () => {
   const { user } = useUser();
   const navigate = useNavigate();
-  const { getToken } = useAuth();
   const [stats, setStats] = useState(null);
   const [recentIssues, setRecentIssues] = useState([]);
-
-  const [recentPage, setRecentPage] = useState(1);
-  const [recentTotalPages, setRecentTotalPages] = useState(1);
+  const [recentPage] = useState(1);
   const [notifications, setNotifications] = useState([]);
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -67,7 +46,6 @@ const AuthDashboard = () => {
         console.error("Failed to load dashboard data", error);
       }
     };
-
     fetchDashboardData();
   }, [recentPage]);
 
@@ -80,15 +58,12 @@ const AuthDashboard = () => {
         setShowNotifications(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
     if (!user?.id) return;
-
-
     socket.on("notification", (data) => {
       setNotifications((prev) => [
         {
@@ -101,192 +76,197 @@ const AuthDashboard = () => {
         ...prev,
       ]);
     });
-
-    return () => {
-      socket.off("notification");
-    };
+    return () => socket.off("notification");
   }, [user]);
 
   return (
     <AuthorityLayout>
-      <div className="flex-1 overflow-y-auto flex flex-col">
+      <div className="flex-1 overflow-y-auto bg-[#0B0F1A] text-slate-200">
         {/* HEADER */}
-        <header className="bg-white border-b px-8 py-6">
+        <header className="border-b border-slate-800 bg-[#0F172A]/50 backdrop-blur-md px-8 py-6 sticky top-0 z-30">
           <div className="flex items-center justify-between w-full">
-            {/* LEFT */}
             <div>
-              <h2 className="text-3xl font-black tracking-tight">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
                 Authority Dashboard
               </h2>
-              <p className="text-gray-500 text-sm mt-1">
-                Welcome back. Here is what's happening in your district today.
+              <p className="text-slate-400 text-sm mt-1">
+                District overview for{" "}
+                <span className="text-blue-400 font-medium">
+                  {user?.fullName}
+                </span>
               </p>
             </div>
 
-            {/* RIGHT – NOTIFICATIONS */}
+            {/* NOTIFICATIONS */}
             <div ref={notificationRef} className="relative">
               <button
                 onClick={async (e) => {
                   e.stopPropagation();
-
                   const willOpen = !showNotifications;
                   setShowNotifications(willOpen);
-
                   if (willOpen && unreadCount > 0) {
                     await axios.patch("/api/notifications/read-all");
-
                     setNotifications((prev) =>
                       prev.map((n) => ({ ...n, isRead: true })),
                     );
                   }
                 }}
-                className="relative p-2 rounded-full hover:bg-gray-100"
+                className="relative p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700"
               >
-                <span className="material-symbols-outlined text-gray-700">
-                  notifications
-                </span>
-
+                <Bell size={20} className="text-slate-300" />
                 {unreadCount > 0 && (
-                  <span
-                    className="
-          absolute -top-1 -right-1
-          min-w-4 h-4 px-1
-          bg-red-500 text-white text-[10px] font-bold
-          rounded-full flex items-center justify-center
-        "
-                  >
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#0B0F1A]">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
+              </button>
+
+              <AnimatePresence>
                 {showNotifications && (
-                  <div
-                    className="
-      absolute right-0 mt-3 w-80
-      bg-white border rounded-xl shadow-lg
-      z-50 overflow-hidden
-    "
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden"
                   >
-                    <div className="px-4 py-3 border-b font-bold text-sm">
+                    <div className="px-4 py-3 border-b border-slate-800 font-bold text-sm text-white bg-slate-800/50">
                       Notifications
                     </div>
-
-                    {notifications.length === 0 ? (
-                      <div className="px-4 py-6 text-sm text-gray-500 text-center">
-                        No notifications
-                      </div>
-                    ) : (
-                      <ul className="max-h-80 overflow-y-auto divide-y">
-                        {notifications.map((n) => (
-                          <li
+                    <div className="max-h-80 overflow-y-auto divide-y divide-slate-800">
+                      {notifications.length === 0 ? (
+                        <div className="px-4 py-8 text-sm text-slate-500 text-center">
+                          No new updates
+                        </div>
+                      ) : (
+                        notifications.map((n) => (
+                          <div
                             key={n._id}
                             onClick={() => {
                               navigate(n.link);
                               setShowNotifications(false);
                             }}
-                            className={`
-              px-4 py-3 text-sm cursor-pointer
-              hover:bg-gray-50
-              ${!n.isRead ? "bg-blue-50" : ""}
-            `}
+                            className={`px-4 py-3 text-sm cursor-pointer hover:bg-slate-800 transition-colors ${!n.isRead ? "bg-blue-500/5 border-l-2 border-blue-500" : ""}`}
                           >
-                            <p className="font-semibold">{n.title}</p>
-                            <p className="text-gray-500 text-xs mt-1">
+                            <p className="font-semibold text-slate-200">
+                              {n.title}
+                            </p>
+                            <p className="text-slate-500 text-xs mt-1">
                               {n.message}
                             </p>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
                 )}
-              </button>
+              </AnimatePresence>
             </div>
           </div>
         </header>
 
         {/* CONTENT */}
-        <div className="p-8 flex flex-col gap-8">
-          {/* STATS */}
+        <div className="p-8 space-y-8">
+          {/* STATS GRID */}
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard title="Open Issues" value={stats?.open || 0} />
-            <StatCard title="In Progress" value={stats?.inProgress || 0} />
-            <StatCard title="Resolved" value={stats?.resolved || 0} />
+            <StatCard
+              title="Open Issues"
+              value={stats?.open || 0}
+              icon={<AlertCircle size={20} />}
+              color="red"
+              trend="Requires action"
+            />
+            <StatCard
+              title="In Progress"
+              value={stats?.inProgress || 0}
+              icon={<Clock size={20} />}
+              color="amber"
+              trend="Currently active"
+            />
+            <StatCard
+              title="Resolved"
+              value={stats?.resolved || 0}
+              icon={<CheckCircle size={20} />}
+              color="emerald"
+              trend="All time"
+            />
 
-            <div
+            {/* Clickable Assigned Card */}
+            <motion.div
+              whileHover={{ y: -4 }}
               onClick={() => navigate("/authority/assigned-issues")}
-              className="bg-primary rounded-xl p-6 cursor-pointer hover:opacity-95 transition"
+              className="bg-blue-600 rounded-2xl p-6 cursor-pointer shadow-lg shadow-blue-900/20 flex flex-col justify-between relative overflow-hidden group"
             >
-              <div className="flex justify-between items-center">
-                <p className="text-sm font-semibold uppercase">
+              <div className="absolute right-[-10%] top-[-10%] opacity-10 group-hover:scale-110 transition-transform">
+                <User size={120} />
+              </div>
+              <div className="flex justify-between items-start z-10">
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-100">
                   Assigned to Me
                 </p>
-                <span className="material-symbols-outlined bg-white/20 p-2 rounded-lg">
-                  person
-                </span>
+                <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
+                  <User size={20} className="text-white" />
+                </div>
               </div>
-
-              {/* ✅ REAL DATA */}
-              <p className="text-3xl font-black mt-2">
-                {stats?.totalAssigned ?? 0}
-              </p>
-
-              <p className="text-xs mt-1">
-                {stats?.inProgress ?? 0} in progress
-              </p>
-            </div>
+              <div className="mt-4 z-10">
+                <p className="text-4xl font-black text-white">
+                  {stats?.totalAssigned ?? 0}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-300 animate-pulse" />
+                  <p className="text-xs text-blue-100 font-medium">
+                    {stats?.inProgress ?? 0} in progress
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </section>
 
-          {/* RECENT ISSUES TABLE */}
-          <section className="bg-white border rounded-xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b flex justify-between items-center">
-              <h3 className="text-lg font-bold">Recent Issues</h3>
+          {/* TABLE SECTION */}
+          <section className="bg-slate-900/50 border border-slate-800 rounded-2xl shadow-sm overflow-hidden backdrop-blur-sm">
+            <div className="px-6 py-5 border-b border-slate-800 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-slate-800 rounded-lg">
+                  <Activity size={18} className="text-blue-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white">
+                  Recent District Activity
+                </h3>
+              </div>
               <button
                 onClick={() => navigate("/authority/assigned-issues")}
-                className="text-primary text-sm font-bold"
+                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition-all"
               >
-                View All Issues
+                View All
               </button>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <TableHead>Issue Title</TableHead>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-800/30">
+                    <TableHead>Issue Details</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Reported Date</TableHead>
+                    <TableHead>Reported At</TableHead>
                     <TableHead>Location</TableHead>
-                    <th />
+                    <th className="px-6 py-4"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-slate-800">
                   {recentIssues.length === 0 ? (
                     <tr>
                       <td
                         colSpan={6}
-                        className="px-6 py-6 text-center text-gray-500"
+                        className="px-6 py-12 text-center text-slate-500 italic"
                       >
-                        No recent assigned issues
+                        No recent issues found in your jurisdiction.
                       </td>
                     </tr>
                   ) : (
                     recentIssues.map((issue) => (
                       <RecentRow
                         key={issue._id}
-                        title={issue.title}
-                        id={issue._id.slice(-6)}
-                        category={issue.category}
-                        status={issue.status.replace("_", " ")}
-                        statusColor={
-                          issue.status === "RESOLVED"
-                            ? "emerald"
-                            : issue.status === "IN_PROGRESS"
-                              ? "amber"
-                              : "blue"
-                        }
-                        date={new Date(issue.createdAt).toLocaleDateString()}
-                        location={issue.location?.address || "—"}
+                        issue={issue}
                         onClick={() =>
                           navigate(`/authority/issues/${issue._id}`)
                         }
@@ -298,65 +278,119 @@ const AuthDashboard = () => {
             </div>
           </section>
         </div>
+        
+        {/* FOOTER */}
+        <footer className="mt-auto px-8 py-8 border-t border-slate-800/50">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-6 rounded bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white">
+                J
+              </div>
+              <span className="text-sm font-bold text-slate-300">
+                Jan<span className="text-blue-500">Samadhan</span>
+              </span>
+            </div>
+            
+            <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
+              © {new Date().getFullYear()} JanSamadhan Platform • Secure Authority Portal
+            </p>
+
+            <div className="flex gap-6">
+              <button className="text-[11px] text-slate-600 hover:text-blue-400 transition-colors uppercase font-bold tracking-tighter">
+                Privacy Policy
+              </button>
+              <button className="text-[11px] text-slate-600 hover:text-blue-400 transition-colors uppercase font-bold tracking-tighter">
+                Support
+              </button>
+            </div>
+          </div>
+        </footer>
       </div>
     </AuthorityLayout>
   );
 };
 
-export default AuthDashboard;
+/* ---------- SUB-COMPONENTS ---------- */
 
-/* ---------- SMALL COMPONENTS ---------- */
+const StatCard = ({ title, value, icon, color, trend }) => {
+  const colorMap = {
+    red: "text-red-400 bg-red-400/10 border-red-400/20",
+    amber: "text-amber-400 bg-amber-400/10 border-amber-400/20",
+    emerald: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
+  };
 
-const StatCard = ({ title, value, icon, color, footer }) => (
-  <div className="bg-white border rounded-xl p-6 shadow-sm">
-    <div className="flex justify-between items-center">
-      <p className="text-sm font-semibold uppercase text-gray-500">{title}</p>
-      <span
-        className={`material-symbols-outlined text-${color}-500 bg-${color}-50 p-2 rounded-lg`}
-      >
-        {icon}
-      </span>
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm hover:border-slate-700 transition-colors">
+      <div className="flex justify-between items-start text-slate-400">
+        <p className="text-xs font-bold uppercase tracking-widest">{title}</p>
+        <div className={`p-2 rounded-xl border ${colorMap[color]}`}>{icon}</div>
+      </div>
+      <div className="mt-4">
+        <p className="text-3xl font-black text-white">{value}</p>
+        <p className="text-[10px] text-slate-500 mt-1 font-medium uppercase tracking-tighter">
+          {trend}
+        </p>
+      </div>
     </div>
-    <p className="text-3xl font-black mt-2">{value}</p>
-    <p className="text-xs text-gray-500 mt-1">{footer}</p>
-  </div>
-);
+  );
+};
 
 const TableHead = ({ children }) => (
-  <th className="px-6 py-4 text-xs font-bold uppercase text-gray-500">
+  <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-500 tracking-widest">
     {children}
   </th>
 );
 
-const RecentRow = ({
-  title,
-  id,
-  category,
-  status,
-  statusColor,
-  date,
-  location,
-  onClick,
-}) => (
-  <tr onClick={onClick} className="hover:bg-gray-50 transition cursor-pointer">
-    <td className="px-6 py-4">
-      <p className="font-bold">{title}</p>
-      <p className="text-xs text-gray-400">ID: #{id}</p>
-    </td>
-    <td className="px-6 py-4 text-sm">{category}</td>
-    <td className="px-6 py-4">
-      <span
-        className={`px-3 py-1 rounded-full text-xs font-bold bg-${statusColor}-100 text-${statusColor}-700`}
-      >
-        {status}
-      </span>
-    </td>
-    <td className="px-6 py-4 text-sm text-gray-500">{date}</td>
-    <td className="px-6 py-4 text-sm text-gray-500">{location}</td>
-    <td className="px-6 py-4 text-right">
-      <span className="material-symbols-outlined text-gray-400 cursor-pointer">
-        chevron_right_arrow
-      </span>
-    </td>
-  </tr>
-);
+const RecentRow = ({ issue, onClick }) => {
+  const statusStyles = {
+    RESOLVED: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    IN_PROGRESS: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+    REPORTED: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    ASSIGNED: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
+  };
+
+  return (
+    <tr
+      onClick={onClick}
+      className="hover:bg-slate-800/40 transition-all cursor-pointer group"
+    >
+      <td className="px-6 py-4">
+        <p className="font-bold text-slate-200 group-hover:text-blue-400 transition-colors">
+          {issue.title}
+        </p>
+        <p className="text-[10px] font-mono text-slate-600 uppercase">
+          ID: {issue._id.slice(-6)}
+        </p>
+      </td>
+      <td className="px-6 py-4">
+        <span className="text-xs font-medium text-slate-400 bg-slate-800 px-2 py-1 rounded border border-slate-700">
+          {issue.category}
+        </span>
+      </td>
+      <td className="px-6 py-4">
+        <span
+          className={`px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-tighter ${statusStyles[issue.status] || statusStyles.REPORTED}`}
+        >
+          {issue.status.replace("_", " ")}
+        </span>
+      </td>
+      <td className="px-6 py-4 text-xs text-slate-500">
+        {new Date(issue.createdAt).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+        })}
+      </td>
+      <td className="px-6 py-4 text-xs text-slate-500 max-w-50 truncate">
+        {issue.location?.address || "Location Hidden"}
+      </td>
+      <td className="px-6 py-4 text-right">
+        <ChevronRight
+          size={18}
+          className="text-slate-700 group-hover:text-slate-400 group-hover:translate-x-1 transition-all"
+        />
+      </td>
+    </tr>
+  );
+};
+
+export default AuthDashboard;

@@ -1,6 +1,6 @@
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Home, AlertCircle, Activity, LogIn } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import axios from "@/lib/axios";
@@ -158,45 +158,97 @@ const CitizenNavbar = () => {
                 </button>
 
                 {/* 🔔 DROPDOWN */}
-                {showDropdown && (
-                  <div className="absolute right-0 mt-3 w-80 rounded-xl border bg-white shadow-lg overflow-hidden z-50">
-                    <div className="px-4 py-3 font-bold border-b">
-                      Notifications
-                    </div>
+<AnimatePresence>
+  {showDropdown && (
+    <motion.div
+      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className="absolute right-0 mt-4 w-85 rounded-2xl border border-slate-100 bg-white/95 shadow-2xl backdrop-blur-xl overflow-hidden z-50 ring-1 ring-black/5"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-50 bg-slate-50/50">
+        <h3 className="font-bold text-slate-800 flex items-center gap-2">
+          Notifications
+          {unreadCount > 0 && (
+            <span className="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full">
+              {unreadCount} New
+            </span>
+          )}
+        </h3>
+        <button 
+           onClick={() => setNotifications(prev => prev.map(n => ({...n, isRead: true})))}
+           className="text-xs font-medium text-emerald-600 hover:text-emerald-700 cursor-pointer transition-colors"
+        >
+          Clear all
+        </button>
+      </div>
 
-                    {notifications.length === 0 ? (
-                      <div className="px-4 py-6 text-sm text-gray-500 text-center">
-                        No notifications
-                      </div>
-                    ) : (
-                      <ul className="max-h-80 overflow-y-auto">
-                        {notifications.map((n) => (
-                          <li
-                            onClick={async () => {
-                              await axios.patch(
-                                `/api/notifications/${n._id}/read`,
-                              );
-                              setNotifications((prev) =>
-                                prev.map((x) =>
-                                  x._id === n._id ? { ...x, isRead: true } : x,
-                                ),
-                              );
-                              if (n.link) navigate(n.link);
-                              setShowDropdown(false);
-                            }}
-                            className={`px-4 py-3 text-sm cursor-pointer hover:bg-gray-50
-    ${!n.isRead ? "bg-emerald-50" : ""}`}
-                          >
-                            <p className="font-semibold">{n.title}</p>
-                            <p className="text-gray-600 text-xs mt-0.5">
-                              {n.message}
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+      {/* List */}
+      <div className="max-h-100 overflow-y-auto custom-scrollbar">
+        {notifications.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+            <div className="bg-slate-50 p-3 rounded-full mb-3 text-slate-300">
+              <Bell size={24} />
+            </div>
+            <p className="text-sm font-medium text-slate-500">All caught up!</p>
+            <p className="text-xs text-slate-400 mt-1">No new activity to report.</p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-slate-50">
+            {notifications.map((n) => (
+              <motion.li
+                key={n._id}
+                whileHover={{ backgroundColor: "rgba(248, 250, 252, 1)" }}
+                onClick={async () => {
+                  await axios.patch(`/api/notifications/${n._id}/read`);
+                  setNotifications((prev) =>
+                    prev.map((x) => (x._id === n._id ? { ...x, isRead: true } : x))
+                  );
+                  if (n.link) navigate(n.link);
+                  setShowDropdown(false);
+                }}
+                className={`group relative px-5 py-4 cursor-pointer transition-all ${
+                  !n.isRead ? "bg-emerald-50/40" : "bg-transparent"
+                }`}
+              >
+                {/* Unread Indicator Dot */}
+                {!n.isRead && (
+                  <div className="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                 )}
+                
+                <div className="flex flex-col gap-1">
+                  <div className="flex justify-between items-start">
+                    <p className={`text-sm leading-tight ${!n.isRead ? "font-bold text-slate-900" : "font-medium text-slate-700"}`}>
+                      {n.title}
+                    </p>
+                    <span className="text-[10px] text-slate-400 whitespace-nowrap ml-2">
+                      Just now
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 line-clamp-2 group-hover:text-slate-600 transition-colors">
+                    {n.message}
+                  </p>
+                </div>
+              </motion.li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="px-4 py-3 bg-slate-50/50 border-t border-slate-50 text-center">
+        <button 
+          onClick={() => { navigate("/citizen/my-issues"); setShowDropdown(false); }}
+          className="text-xs font-bold text-slate-500 hover:text-emerald-600 transition-colors uppercase tracking-wider"
+        >
+          View All Activity
+        </button>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
               </div>
 
               {/* User Avatar*/}
