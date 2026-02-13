@@ -2,6 +2,9 @@ import { useState } from "react";
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 import axios from "../../lib/axios";
 import { useAuth } from "@clerk/clerk-react";
+import { Search } from "lucide-react";
+import { BookOpen, AlertCircle, ShieldCheck } from "lucide-react";
+import { ArrowRight, Phone, Bot, Ticket } from "lucide-react";
 
 const AuthoritySupport = () => {
   const [search, setSearch] = useState("");
@@ -20,19 +23,10 @@ const AuthoritySupport = () => {
 
     try {
       const token = await getToken();
-
       await axios.post(
         "/api/support/tickets",
-        {
-          title: ticketTitle,
-          description: ticketDesc,
-          priority: "MEDIUM",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { title: ticketTitle, description: ticketDesc, priority: "MEDIUM" },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       alert("Support ticket submitted successfully");
@@ -48,16 +42,19 @@ const AuthoritySupport = () => {
     {
       id: 1,
       title: "Self-Service Documentation",
+      icon: BookOpen, // Replaces "menu_book"
       keywords: ["manual", "docs", "faq", "documentation"],
     },
     {
       id: 2,
       title: "Technical Support & Reporting",
+      icon: AlertCircle, // Replaces "report_problem"
       keywords: ["bug", "error", "ticket", "support"],
     },
     {
       id: 3,
       title: "Escalation & Administrative Help",
+      icon: ShieldCheck, // Replaces "shield_person"
       keywords: ["admin", "escalation", "permission"],
     },
   ];
@@ -74,52 +71,60 @@ const AuthoritySupport = () => {
 
   return (
     <AuthorityLayout>
-      <main className="flex-1 overflow-y-auto bg-slate-50">
-        {/* HEADER */}
-        <header className="bg-white border-b border-slate-200 px-10 py-8">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <main className="flex-1 overflow-y-auto bg-[#0a0f1d] text-slate-300">
+        {/* HEADER SECTION - Upgraded with backdrop blur and accent glow */}
+        <header className="bg-[#111827]/80 backdrop-blur-xl border-b border-white/5 px-10 py-10 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full -mr-20 -mt-20" />
+
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
             <div>
-              <h2 className="text-slate-900 text-2xl font-extrabold tracking-tight">
+              <h2 className="text-white text-3xl font-bold tracking-tight flex items-center gap-3">
                 Support & Resource Center
               </h2>
-              <p className="text-slate-500 text-sm mt-1">
+              <p className="text-slate-500 text-sm mt-2 font-medium">
                 Official portal for technical assistance and administrative
                 documentation.
               </p>
             </div>
 
             <div className="relative w-full max-w-sm">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                search
-              </span>
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                <Search className="w-4 h-4 text-slate-500 group-focus-within:text-blue-500 transition-colors duration-300" />
+              </div>
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search documentation or FAQs..."
-                className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-slate-200"
+                className="w-full bg-[#0d1424] border border-white/10 pl-10 pr-4 py-3 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-slate-600 text-white"
               />
             </div>
           </div>
         </header>
 
-        {/* CONTENT */}
+        {/* CONTENT AREA */}
         <div className="p-10 max-w-6xl mx-auto w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* LEFT COLUMN */}
+            {/* LEFT COLUMN: Support Channels */}
             <div className="lg:col-span-8 space-y-4">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
-                Support Channels
+              <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
+                Available Channels
               </h3>
 
-              {filteredItems.map((item) => {
-                if (item.id === 1)
-                  return (
-                    <SupportCard
-                      key={item.id}
-                      icon="menu_book"
-                      title="Self-Service Documentation"
-                      desc="Access comprehensive user manuals, standard operating procedures, and video tutorials for platform features."
-                    >
+              {filteredItems.map((item) => (
+                <SupportCard
+                  key={item.id}
+                  icon={item.icon}
+                  title={item.title}
+                  desc={
+                    item.id === 1
+                      ? "Access comprehensive user manuals, standard operating procedures, and video tutorials for platform features."
+                      : item.id === 2
+                        ? "Encountering system errors or login issues? Raise an official IT ticket or report platform bugs."
+                        : "For cross-departmental coordination, account permission overrides, or urgent administrative policy inquiries."
+                  }
+                >
+                  {item.id === 1 && (
+                    <>
                       <LinkButton
                         text="User Manuals"
                         onClick={() =>
@@ -135,177 +140,182 @@ const AuthoritySupport = () => {
                           window.open("/docs/authority-faqs.pdf", "_blank")
                         }
                       />
-                    </SupportCard>
-                  );
-
-                if (item.id === 2)
-                  return (
-                    <SupportCard
-                      key={item.id}
-                      icon="report_problem"
-                      title="Technical Support & Reporting"
-                      desc="Encountering system errors or login issues? Raise an official IT ticket or report platform bugs."
+                    </>
+                  )}
+                  {item.id === 2 && (
+                    <button
+                      onClick={() => setShowTicketModal(true)}
+                      className="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold px-5 py-2 rounded-lg transition-all shadow-lg shadow-blue-900/20 uppercase tracking-wider cursor-pointer"
                     >
-                      <button
-                        onClick={() => setShowTicketModal(true)}
-                        className="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-lg"
-                      >
-                        Raise IT Ticket
-                      </button>
-                    </SupportCard>
-                  );
-
-                if (item.id === 3)
-                  return (
-                    <SupportCard
-                      key={item.id}
-                      icon="shield_person"
-                      title="Escalation & Administrative Help"
-                      desc="For cross-departmental coordination, account permission overrides, or urgent administrative policy inquiries."
-                    >
-                      <LinkButton
-                        text="Contact Administrator"
-                        onClick={() =>
-                          (window.location.href =
-                            "mailto:gouravmanjhi9313@gmail.com?subject=Administrative Escalation - JanSamadhan&body=Authority ID:%0D%0AName:%0D%0ADepartment:%0D%0ARequest Details:")
-                        }
-                      />
-                    </SupportCard>
-                  );
-              })}
+                      Raise IT Ticket
+                    </button>
+                  )}
+                  {item.id === 3 && (
+                    <LinkButton
+                      text="Contact Administrator"
+                      onClick={() =>
+                        (window.location.href =
+                          "mailto:gouravmanjhi9313@gmail.com?subject=Administrative Escalation&body=Authority ID:")
+                      }
+                    />
+                  )}
+                </SupportCard>
+              ))}
             </div>
 
-            {/* RIGHT COLUMN */}
+            {/* RIGHT COLUMN: Quick Contact & Stats */}
             <div className="lg:col-span-4 space-y-6">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">
+              <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
                 Quick Contact
               </h3>
 
-              {/* QUICK CONTACT */}
-              <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+              {/* AI CHAT & HOTLINE CARD */}
+              <div className="bg-[#111827] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
                 <div className="p-6">
-                  <h4 className="font-bold text-slate-900 mb-2">
+                  <h4 className="font-bold text-white mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                     Immediate Assistance
                   </h4>
-                  <p className="text-xs text-slate-500 mb-6">
+                  <p className="text-xs text-slate-500 mb-6 leading-relaxed">
                     Need instant answers? Our AI-powered assistant is trained on
                     government protocols.
                   </p>
 
                   <button
                     onClick={() => alert("AI Assistant will be enabled soon")}
-                    className="w-full bg-blue-700 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2"
+                    className="w-full bg-[#1e293b] hover:bg-[#334155] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors border border-white/5"
                   >
-                    <span className="material-symbols-outlined">smart_toy</span>
+                    <Bot size={20} className="text-primary" />
                     Launch AI Chat
                   </button>
 
-                  <div className="border-t border-slate-100 mt-6 pt-5">
-                    <p className="text-[10px] uppercase font-bold text-slate-400">
+                  <div className="border-t border-white/5 mt-8 pt-6">
+                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-tighter mb-2">
                       Support Hotline
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="material-symbols-outlined text-blue-700">
-                        call
-                      </span>
+                    <div className="flex items-center gap-3 group">
+                      <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+                        <Phone className="w-5 h-5 text-blue-500" />
+                      </div>
                       <a
                         href="tel:18004567890"
-                        className="text-xl font-bold hover:underline"
+                        className="text-xl font-bold text-white hover:text-blue-400 transition-colors"
                       >
                         1800-456-7890
                       </a>
                     </div>
-                    <p className="text-[10px] text-slate-500 mt-2">
+                    <p className="text-[10px] text-slate-600 mt-3 italic">
                       Available 24/7 for Authorized Personnel Only
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-slate-50 px-6 py-4 border-t">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500">SLA Status</span>
-                    <span className="text-emerald-600 font-bold flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                      {slaStatus}
+                <div className="bg-white/5 px-6 py-4 flex items-center justify-between border-t border-white/5">
+                  <span className="text-[11px] text-slate-500 font-medium">
+                    SLA Monitor
+                  </span>
+                  <span className="text-emerald-500 text-[11px] font-black flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    {slaStatus.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+
+              {/* SERVICE HOURS CARD */}
+              <div className="bg-[#111827]/50 border border-white/5 rounded-2xl p-6">
+                <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
+                  Operations Window
+                </h5>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center pb-3 border-b border-white/5">
+                    <span className="text-xs text-slate-400">Tech Support</span>
+                    <span className="text-xs font-bold text-white bg-blue-500/10 px-2 py-1 rounded">
+                      24/7
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-400">Admin Node</span>
+                    <span className="text-xs font-bold text-white">
+                      09:00 — 18:00
                     </span>
                   </div>
                 </div>
               </div>
-
-              {/* SERVICE HOURS */}
-              <div className="bg-slate-100 border border-slate-200 rounded-lg p-5">
-                <h5 className="text-xs font-bold uppercase mb-3">
-                  Service Hours
-                </h5>
-                <ul className="space-y-2 text-xs text-slate-600">
-                  <li className="flex justify-between">
-                    <span>Tech Support</span>
-                    <span className="font-bold">24/7</span>
-                  </li>
-                  <li className="flex justify-between">
-                    <span>Admin Help</span>
-                    <span className="font-bold">09:00 - 18:00</span>
-                  </li>
-                </ul>
-              </div>
             </div>
           </div>
+        </div>
+        {/* FOOTER - Placed inside main, but at the bottom */}
+        <footer className="mt-auto pt-12 pb-8 border-t border-white/5 px-10">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            {/* BRANDING */}
+            <div className="flex items-center gap-3 group cursor-pointer">
+              <div className="h-7 w-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-black text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] group-hover:scale-110 transition-transform">
+                J
+              </div>
+              <span className="text-sm font-bold text-slate-400 group-hover:text-white transition-colors">
+                Jan<span className="text-blue-500">Samadhan</span>
+              </span>
+            </div>
 
-          {/* FOOTER */}
-          {/* <div className="mt-16 text-center border-t border-slate-200 pt-10">
-            <p className="text-slate-500 text-sm">
-              Can't find what you're looking for?
+            {/* COPYRIGHT */}
+            <p className="text-[10px] font-bold tracking-[0.15em] text-slate-600 text-center md:text-left">
+              © {new Date().getFullYear()} JanSamadhan Platform • Secure
+              Authority Node
             </p>
-            <div className="mt-4 flex justify-center gap-4 text-sm font-bold text-blue-700">
-              <button onClick={() => alert("Knowledge Base coming soon")}>
-                Explore Knowledge Base
-              </button>
 
-              <button onClick={() => alert("System status page coming soon")}>
-                View System Status
+            {/* LINKS */}
+            <div className="flex gap-8">
+              <button className="text-[10px] text-slate-500 hover:text-blue-400 transition-all uppercase font-black tracking-widest">
+                Privacy Protocol
               </button>
-
-              <button onClick={() => alert("Feedback form coming soon")}>
-                Submit Feedback
+              <button className="text-[10px] text-slate-500 hover:text-blue-400 transition-all uppercase font-black tracking-widest">
+                System Support
               </button>
             </div>
-          </div> */}
-        </div>
+          </div>
+        </footer>
       </main>
 
+      {/* MODAL - Enhanced with Backdrop Blur and Dark Accents */}
       {showTicketModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl w-96 p-6 space-y-4">
-            <h3 className="text-lg font-bold">Raise IT Ticket</h3>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <div className="bg-[#111827] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="p-6 border-b border-white/5">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Ticket size={20} className="text-white" />
+                Raise IT Ticket
+              </h3>
+            </div>
 
-            <input
-              value={ticketTitle}
-              onChange={(e) => setTicketTitle(e.target.value)}
-              placeholder="Issue Title"
-              className="w-full border rounded-lg px-3 py-2"
-            />
+            <div className="p-6 space-y-4">
+              <input
+                value={ticketTitle}
+                onChange={(e) => setTicketTitle(e.target.value)}
+                placeholder="Brief summary of the issue"
+                className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-blue-500 outline-none"
+              />
+              <textarea
+                value={ticketDesc}
+                onChange={(e) => setTicketDesc(e.target.value)}
+                placeholder="Please describe the technical error in detail..."
+                className="w-full bg-[#0a0f1d] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-blue-500 outline-none h-32 resize-none"
+              />
 
-            <textarea
-              value={ticketDesc}
-              onChange={(e) => setTicketDesc(e.target.value)}
-              placeholder="Describe the issue"
-              className="w-full border rounded-lg px-3 py-2 h-24"
-            />
-
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowTicketModal(false)}
-                className="px-4 py-2 border rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={submitTicket}
-                disabled={!ticketTitle || !ticketDesc}
-                className="px-4 py-2 bg-slate-900 text-white rounded-lg disabled:opacity-50"
-              >
-                Submit
-              </button>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setShowTicketModal(false)}
+                  className="px-5 py-2.5 text-slate-400 hover:text-white transition-colors text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitTicket}
+                  disabled={!ticketTitle || !ticketDesc}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm disabled:opacity-30 hover:bg-blue-500 transition-all active:scale-95"
+                >
+                  Submit Protocol
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -314,19 +324,18 @@ const AuthoritySupport = () => {
   );
 };
 
-export default AuthoritySupport;
+/* ---------- UI COMPONENTS ---------- */
 
-/* ---------- SMALL COMPONENTS ---------- */
-
-const SupportCard = ({ icon, title, desc, children }) => (
-  <div className="bg-white border border-slate-200 rounded-lg p-6 flex gap-6 hover:shadow-md transition">
-    <div className="w-12 h-12 flex items-center justify-center bg-slate-50 rounded-lg border shrink-0">
-      <span className="material-symbols-outlined text-blue-700">{icon}</span>
+const SupportCard = ({ icon: Icon, title, desc, children }) => (
+  <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex gap-6 hover:border-blue-500/30 transition-all shadow-lg group">
+    <div className="w-14 h-14 flex items-center justify-center bg-[#0d1424] rounded-xl border border-white/5 shrink-0 group-hover:bg-blue-500/10 transition-colors">
+      {/* Render the component directly */}
+      <Icon className="text-blue-500 w-7 h-7 group-hover:scale-110 transition-transform" />
     </div>
     <div className="flex-1">
-      <h4 className="font-bold text-lg mb-1">{title}</h4>
-      <p className="text-sm text-slate-500 mb-4">{desc}</p>
-      <div className="flex gap-3 items-center">{children}</div>
+      <h4 className="font-bold text-white text-lg mb-1">{title}</h4>
+      <p className="text-sm text-slate-500 mb-5 leading-relaxed">{desc}</p>
+      <div className="flex gap-5 items-center">{children}</div>
     </div>
   </div>
 );
@@ -334,9 +343,11 @@ const SupportCard = ({ icon, title, desc, children }) => (
 const LinkButton = ({ text, onClick }) => (
   <button
     onClick={onClick}
-    className="text-xs font-semibold text-blue-700 flex items-center gap-1 hover:underline"
+    className="text-[11px] font-bold text-blue-400 flex items-center gap-1 hover:text-blue-300 transition-all uppercase tracking-wider group"
   >
     {text}
-    <span className="material-symbols-outlined text-xs">arrow_forward</span>
+    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
   </button>
 );
+
+export default AuthoritySupport;

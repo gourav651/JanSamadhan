@@ -19,7 +19,7 @@ const AuthMapView = () => {
 
   const navigate = useNavigate();
 
-  const [allIssues, setAllIssues] = useState([]); 
+  const [allIssues, setAllIssues] = useState([]);
   const [issues, setIssues] = useState([]); // visible issues
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
@@ -97,7 +97,6 @@ const AuthMapView = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [selectedIssue]);
-
 
   const fetchMapIssues = async () => {
     try {
@@ -185,50 +184,84 @@ const AuthMapView = () => {
           onClick={(e) => e.stopPropagation()}
           className="absolute top-6 right-6 z-40"
         >
-          <div className="flex items-center gap-2 bg-[#111827]/90 backdrop-blur-xl px-3 py-2 rounded-xl border border-white/10 shadow-lg">
-            <select
-              value={filters.category}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, category: e.target.value }))
-              }
-              className="px-3 py-2 text-xs bg-transparent text-gray-200"
-            >
-              <option value="">Category</option>
-              <option value="GARBAGE">Garbage</option>
-              <option value="ROAD">Road</option>
-              <option value="WATER">Water</option>
-            </select>
-
-            <select
-              value={filters.status}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, status: e.target.value }))
-              }
-              className="px-3 py-2 text-xs bg-transparent text-gray-200"
-            >
-              <option value="">Status</option>
-              <option value="ASSIGNED">Open</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="RESOLVED">Resolved</option>
-            </select>
-
-            <select
-              value={filters.radius}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, radius: Number(e.target.value) }))
-              }
-              className="px-3 py-2 text-xs bg-transparent text-gray-200"
-            >
-              <option value={2}>2 km</option>
-              <option value={5}>5 km</option>
-              <option value={10}>10 km</option>
-            </select>
-
+          <div className="flex items-center gap-3 bg-[#111827]/80 backdrop-blur-xl px-4 py-2.5 rounded-2xl border border-white/10">
+            {/* Styled Dropdown Wrapper */}
+            {[
+              {
+                label: "Category",
+                value: filters.category,
+                key: "category",
+                options: [
+                  "GARBAGE",
+                  "ROAD",
+                  "WATER",
+                  "POTHOLE",
+                  "STREET_LIGHT",
+                ],
+              },
+              {
+                label: "Status",
+                value: filters.status,
+                key: "status",
+                options: ["ASSIGNED", "IN_PROGRESS", "RESOLVED"],
+              },
+              {
+                label: "Radius",
+                value: filters.radius,
+                key: "radius",
+                options: [2, 5, 10],
+                suffix: " km",
+              },
+            ].map((filter) => (
+              <div key={filter.key} className="relative group">
+                <select
+                  value={filter.value}
+                  onChange={(e) =>
+                    setFilters((f) => ({
+                      ...f,
+                      [filter.key]:
+                        filter.key === "radius"
+                          ? Number(e.target.value)
+                          : e.target.value,
+                    }))
+                  }
+                  className="appearance-none pl-3 pr-8 py-2 text-[11px] font-bold tracking-wide bg-slate-800/50 hover:bg-slate-700/50 text-white rounded-xl border border-white/5 focus:border-blue-500/50 focus:outline-none transition-all cursor-pointer"
+                >
+                  <option value="" className="bg-[#111827] text-gray-400">
+                    {filter.label}
+                  </option>
+                  {filter.options.map((opt) => (
+                    <option
+                      key={opt}
+                      value={opt}
+                      className="bg-[#111827] text-white"
+                    >
+                      {String(opt).replace("_", " ")}
+                      {filter.suffix || ""}
+                    </option>
+                  ))}
+                </select>
+                {/* Custom Chevron Icon for attractiveness */}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 group-hover:text-blue-400 transition-colors">
+                  <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                    <path
+                      d="M1 1L5 5L9 1"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            ))}
+            <div className="h-6 w-px bg-white/10 mx-1" />{" "}
+            {/* Vertical Divider */}
             <button
               onClick={fetchMapIssues}
-              className="ml-2 bg-primary px-4 py-2 rounded-lg text-xs font-bold"
+              className="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-black tracking-widest px-5 py-2.5 rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_25px_rgba(37,99,235,0.6)] active:scale-95 transition-all uppercase cursor-pointer"
             >
-              APPLY
+              Apply
             </button>
           </div>
         </div>
@@ -244,8 +277,8 @@ const AuthMapView = () => {
           }}
         >
           <TileLayer
-            attribution="&copy; OpenStreetMap contributors"
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="&copy; Stadia Maps, &copy; OpenStreetMap"
+            url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
           />
 
           <MarkerClusterGroup

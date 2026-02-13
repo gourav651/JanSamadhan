@@ -113,7 +113,7 @@ const AdminLayout = () => {
 
           <button
             onClick={() => setShowLogout((prev) => !prev)}
-            className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
+            className={`w-full flex items-center cursor-pointer gap-3 p-3 rounded-xl transition-all duration-200 ${
               showLogout
                 ? "bg-slate-100"
                 : "hover:bg-slate-50 border border-transparent hover:border-slate-200"
@@ -134,7 +134,7 @@ const AdminLayout = () => {
             </div>
             <ChevronDown
               size={16}
-              className={`text-slate-400 cursor-pointer transition-transform ${showLogout ? "" : "rotate-180"}`}
+              className={`text-slate-400 transition-transform ${showLogout ? "" : "rotate-180"}`}
             />
           </button>
         </div>

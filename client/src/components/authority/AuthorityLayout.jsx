@@ -1,29 +1,39 @@
 import { NavLink } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useUser, useClerk } from "@clerk/clerk-react";
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Map as MapIcon,
+  Settings,
+  LifeBuoy,
+  LogOut,
+  ChevronDown,
+  ShieldCheck,
+} from "lucide-react";
 import socket from "@/lib/socket";
 
 const AuthorityLayout = ({ children }) => {
-  const { user,isSignedIn } = useUser();
+  const { user } = useUser();
   const { signOut } = useClerk();
 
   const [notifications, setNotifications] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
   const accountRef = useRef(null);
 
-useEffect(() => {
-  socket.on("notification", (data) => {
-    setNotifications((prev) => [data, ...prev]);
-  });
+  useEffect(() => {
+    socket.on("notification", (data) => {
+      setNotifications((prev) => [data, ...prev]);
+    });
 
-  return () => socket.off("notification");
-}, []);
+    return () => socket.off("notification");
+  }, []);
 
-  // 🔹 Close logout on outside click
+  // Close logout on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (accountRef.current && !accountRef.current.contains(e.target)) {
-        setOpen(false);
+        setShowLogout(false);
       }
     };
 
@@ -35,85 +45,146 @@ useEffect(() => {
   const avatar = user?.imageUrl;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* 🔹 FIXED SIDEBAR */}
-      <aside className="w-64 shrink-0 bg-white border-r flex flex-col">
-        {/* LOGO */}
-        <div className="p-4">
-          <h2 className="text-xl font-bold">JanSamadhan</h2>
+    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
+      {/* ================= SIDEBAR ================= */}
+      <aside className="w-72 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-sm">
+        {/* Logo Section */}
+        <div className="h-20 flex items-center px-6 border-b border-slate-50">
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-600 rounded-xl size-10 flex items-center justify-center shadow-indigo-200 shadow-lg">
+              <ShieldCheck className="text-white size-6" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-slate-900">
+              Jan<span className="text-indigo-600">Samadhan</span>
+            </span>
+          </div>
         </div>
 
-        {/* NAV */}
-        <nav className="flex flex-col gap-2 px-4">
-          <SidebarLink
-            to="/authority/assigned-issues"
-            label="Assigned Issues"
-          />
-          <SidebarLink to="/authority/dashboard" label="Dashboard" />
-          <SidebarLink to="/authority/map" label="Map View" />
-          <SidebarLink to="/authority/settings" label="Settings" />
-          <SidebarLink to="/authority/support" label="Support" />
-        </nav>
+        {/* Navigation Section */}
+        <div className="flex-1 py-6 px-4 space-y-8 overflow-y-auto">
+          <div>
+            <p className="px-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">
+              Work Management
+            </p>
+            <nav className="space-y-1.5">
+              <SidebarLink
+                to="/authority/assigned-issues"
+                icon={<ClipboardList size={20} />}
+                label="Assigned Issues"
+              />
+              <SidebarLink
+                to="/authority/dashboard"
+                icon={<LayoutDashboard size={20} />}
+                label="Dashboard"
+              />
+              <SidebarLink
+                to="/authority/map"
+                icon={<MapIcon size={20} />}
+                label="Map View"
+              />
+            </nav>
+          </div>
 
-        {/* 🔹 ACCOUNT SECTION (BOTTOM) */}
-        <div ref={accountRef} className="mt-auto border-t px-4 py-4 relative cursor-pointer">
-          {/* LOGOUT BUTTON */}
-          {open && (
-            <button
-              onClick={() => signOut({ redirectUrl: "/" })}
-              className="absolute cursor-pointer bottom-full mb-2 w-30 flex items-center gap-2 px-4 py-2 rounded-lg border bg-white text-red-600 hover:bg-red-50 text-sm font-semibold shadow"
-            >
-              Logout
-            </button>
+          <div>
+            <p className="px-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">
+              System
+            </p>
+            <nav className="space-y-1.5">
+              <SidebarLink
+                to="/authority/settings"
+                icon={<Settings size={20} />}
+                label="Settings"
+              />
+              <SidebarLink
+                to="/authority/support"
+                icon={<LifeBuoy size={20} />}
+                label="Support"
+              />
+            </nav>
+          </div>
+        </div>
+
+        {/* User Profile Section */}
+        <div
+          className="p-4 border-t border-slate-100 relative"
+          ref={accountRef}
+        >
+          {showLogout && (
+            <div className="absolute bottom-full left-4 right-4 mb-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2">
+              <button
+                onClick={() => signOut({ redirectUrl: "/" })}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+              >
+                <LogOut size={16} />
+                Logout Session
+              </button>
+            </div>
           )}
 
-          {/* ACCOUNT INFO */}
           <button
-            onClick={() => setOpen((v) => !v)}
-            className="w-full flex items-center gap-3 text-left"
+            onClick={() => setShowLogout((prev) => !prev)}
+            className={`w-full flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 ${
+              showLogout
+                ? "bg-slate-100"
+                : "hover:bg-slate-50 border border-transparent hover:border-slate-200"
+            }`}
           >
             {avatar ? (
               <img
                 src={avatar}
                 alt="avatar"
-                className="w-10 h-10 rounded-full object-cover"
+                className="size-10 rounded-lg object-cover ring-2 ring-slate-100"
               />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-700">
+              <div className="size-10 rounded-lg bg-indigo-100 flex items-center justify-center font-bold text-indigo-700">
                 {name.charAt(0)}
               </div>
             )}
 
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-slate-900">
+            <div className="flex flex-col text-left flex-1 min-w-0">
+              <span className="text-sm font-bold text-slate-900 truncate">
                 {name}
               </span>
-              <span className="text-xs text-slate-500">Authority User</span>
+              <span className="text-xs font-medium text-slate-500">
+                Authority Officer
+              </span>
             </div>
+            <ChevronDown
+              size={16}
+              className={`text-slate-400 transition-transform duration-200 ${
+                showLogout ? "rotate-180" : ""
+              }`}
+            />
           </button>
         </div>
       </aside>
 
-      {/* 🔹 PAGE CONTENT */}
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      {/* ================= PAGE CONTENT ================= */}
+      <main className="flex-1 overflow-y-auto bg-slate-50">{children}</main>
     </div>
   );
 };
 
-export default AuthorityLayout;
+/* ================= SIDEBAR LINK COMPONENT ================= */
+const SidebarLink = ({ to, icon, label }) => {
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group
+        ${
+          isActive
+            ? "bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100/50"
+            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+        }`
+      }
+    >
+      <span className="transition-colors group-hover:scale-110 duration-200">
+        {icon}
+      </span>
+      {label}
+    </NavLink>
+  );
+};
 
-/* 🔹 SIDEBAR LINK */
-const SidebarLink = ({ to, label }) => (
-  <NavLink
-    to={to}
-    className={({ isActive }) =>
-      `block px-2 py-1.5 rounded text-sm ${
-        isActive
-          ? "font-semibold text-primary"
-          : "text-gray-500 hover:text-gray-700"
-      }`
-    }
-  >
-    {label}
-  </NavLink>
-);
+export default AuthorityLayout;

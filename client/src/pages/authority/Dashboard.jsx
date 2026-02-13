@@ -111,7 +111,7 @@ const AuthDashboard = () => {
                     );
                   }
                 }}
-                className="relative p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700"
+                className="relative p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors border border-slate-700 cursor-pointer"
               >
                 <Bell size={20} className="text-slate-300" />
                 {unreadCount > 0 && (
@@ -234,7 +234,7 @@ const AuthDashboard = () => {
               </div>
               <button
                 onClick={() => navigate("/authority/assigned-issues")}
-                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition-all"
+                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition-all cursor-pointer"
               >
                 View All
               </button>
@@ -278,7 +278,7 @@ const AuthDashboard = () => {
             </div>
           </section>
         </div>
-        
+
         {/* FOOTER */}
         <footer className="mt-auto px-8 py-8 border-t border-slate-800/50">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -290,9 +290,10 @@ const AuthDashboard = () => {
                 Jan<span className="text-blue-500">Samadhan</span>
               </span>
             </div>
-            
-            <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
-              © {new Date().getFullYear()} JanSamadhan Platform • Secure Authority Portal
+
+            <p className="text-[11px] font-medium tracking-wide text-slate-500 ">
+              © {new Date().getFullYear()} JanSamadhan Platform • Secure
+              Authority Portal
             </p>
 
             <div className="flex gap-6">
