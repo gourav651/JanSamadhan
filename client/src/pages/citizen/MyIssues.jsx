@@ -57,12 +57,14 @@ const CitizenMyIssues = () => {
     <>
       <CitizenNavbar />
 
-      <div className="min-h-screen bg-white px-4 py-8">
+      <div className="min-h-screen bg-white px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-6xl mx-auto">
           {/* HEADER */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold">My Issues</h2>
-            <p className="text-gray-500">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">
+              My Issues
+            </h2>
+            <p className="text-sm sm:text-base text-gray-500">
               Track the status of the problems you've reported.
             </p>
           </div>
@@ -75,7 +77,7 @@ const CitizenMyIssues = () => {
                 whileHover={{ y: -5, scale: 1.005 }} // Subtle lift
                 transition={{ type: "spring", stiffness: 300 }}
                 onClick={() => navigate(`/citizen/issues/${issue._id}`)}
-                className="relative group bg-emerald-50 border-2 border-slate-300 rounded-3xl p-4 md:p-5 hover:shadow-[4px_4px_0px_0px_rgba(16,185,129,1)] transition-all cursor-pointer overflow-hidden mb-4"
+                className="relative group bg-emerald-50 border-2 border-slate-300 rounded-3xl p-3 sm:p-4 md:p-5 hover:shadow-[4px_4px_0px_0px_rgba(16,185,129,1)] transition-all cursor-pointer overflow-hidden mb-4"
               >
                 {/* Decorative Background Accent - Made Smaller */}
                 <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-full -mr-12 -mt-12 transition-transform group-hover:scale-110" />
@@ -96,10 +98,10 @@ const CitizenMyIssues = () => {
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors leading-tight">
+                      <h3 className="text-lg sm:text-xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors leading-tight">
                         {issue.title}
                       </h3>
-                      <p className="text-slate-500 font-medium text-sm line-clamp-1 leading-normal max-w-2xl">
+                      <p className="text-slate-500 font-medium text-xs sm:text-sm line-clamp-1 leading-normal max-w-2xl">
                         {issue.description}
                       </p>
                     </div>
@@ -111,7 +113,7 @@ const CitizenMyIssues = () => {
                       </div>
                       <div className="flex items-center gap-1.5 text-slate-400 font-bold text-[10px] uppercase">
                         <MapPin size={14} className="text-emerald-400" />
-                        <span className="truncate max-w-50">
+                        <span className="truncate max-w-30 sm:max-w-50">
                           {issue.location?.address || "Unknown Location"}
                         </span>
                       </div>
@@ -119,8 +121,8 @@ const CitizenMyIssues = () => {
                   </div>
 
                   {/* RIGHT ACTION PANEL - Changed to Horizontal on Mobile, Slimmer on Desktop */}
-                  <div className="flex flex-row md:flex-col justify-between items-center md:items-end md:border-l-2 border-slate-100 md:pl-6 min-w-35 gap-2">
-                    <div className="flex items-center gap-2 bg-slate-50 border-2 border-slate-400 px-3 py-1 rounded-lg  group-hover:bg-white transition-colors">
+                  <div className="flex flex-row sm:flex-row md:flex-col justify-between items-center md:items-end md:border-l-2 border-slate-100 md:pl-6 min-w-27.5 sm:min-w-35 gap-2 mt-2 md:mt-0">
+                    <div className="flex items-center gap-1.5 bg-slate-50 border-2 border-slate-400 px-2.5 sm:px-3 py-1 rounded-lg group-hover:bg-white transition-colors">
                       <ThumbsUp size={14} className="text-emerald-500" />
                       <span className="font-black text-slate-900 text-sm">
                         {issue.upvotes ?? 0}
@@ -139,11 +141,12 @@ const CitizenMyIssues = () => {
 
           {/* PAGINATION */}
           {totalPages > 1 && (
-            <div className="mt-8 flex justify-center items-center gap-2">
+            <div className="mt-8 flex flex-wrap justify-center items-center gap-2">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((p) => p - 1)}
-                className="px-3 py-2 border rounded-lg disabled:opacity-40"
+                className="px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm
+ border rounded-lg disabled:opacity-40"
               >
                 Previous
               </button>
@@ -152,7 +155,8 @@ const CitizenMyIssues = () => {
                 <>
                   <button
                     onClick={() => setCurrentPage(1)}
-                    className="px-3 py-2 border rounded-lg"
+                    className="px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm
+ border rounded-lg"
                   >
                     1
                   </button>
@@ -177,7 +181,8 @@ const CitizenMyIssues = () => {
                   <span className="px-2">...</span>
                   <button
                     onClick={() => setCurrentPage(totalPages)}
-                    className="px-3 py-2 border rounded-lg"
+                    className="px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm
+ border rounded-lg"
                   >
                     {totalPages}
                   </button>
@@ -187,7 +192,8 @@ const CitizenMyIssues = () => {
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((p) => p + 1)}
-                className="px-3 py-2 border rounded-lg disabled:opacity-40"
+                className="px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm
+ border rounded-lg disabled:opacity-40"
               >
                 Next
               </button>

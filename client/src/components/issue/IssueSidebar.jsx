@@ -42,12 +42,14 @@ const IssueSidebar = ({ issue }) => {
 
   return (
     <>
-      <div className="space-y-6 sticky top-24">
+      <div className="space-y-5 sm:space-y-6 lg:sticky lg:top-24">
         {/* 🗳️ UPVOTE CARD */}
-        <div className="relative overflow-hidden bg-linear-to-br from-amber-400 to-orange-600 rounded-2xl p-6 shadow-lg shadow-orange-100 group">
+        <div className="relative overflow-hidden bg-linear-to-br from-amber-400 to-orange-600 rounded-2xl p-4 sm:p-6 shadow-lg shadow-orange-100 group">
           <div className="relative z-10 flex justify-between items-center">
             <div className="text-white">
-              <p className="text-4xl font-black leading-none">{upvotes}</p>
+              <p className="text-3xl sm:text-4xl font-black leading-none">
+                {upvotes}
+              </p>
               <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mt-1">
                 Total Upvotes
               </p>
@@ -56,7 +58,7 @@ const IssueSidebar = ({ issue }) => {
             <button
               onClick={handleUpvote}
               disabled={loading}
-              className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold transition-all transform active:scale-95 shadow-md cursor-pointer
+              className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl font-bold transition-all transform active:scale-95 shadow-md cursor-pointer
                 ${
                   loading
                     ? "bg-white/20 text-white/50 cursor-not-allowed"
@@ -72,7 +74,7 @@ const IssueSidebar = ({ issue }) => {
         </div>
 
         {/* 📍 LOCATION CARD */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 font-bold text-slate-800">
               <MapPin size={18} className="text-indigo-500" />
@@ -94,7 +96,7 @@ const IssueSidebar = ({ issue }) => {
 
           <div className=" overflow-hidden border border-slate-100 shadow-inner">
             {lat && lng ? (
-              <div className="h-44 w-full">
+              <div className="h-36 sm:h-44 w-full">
                 <LocationPreviewMap lat={lat} lng={lng} />
               </div>
             ) : (
@@ -106,7 +108,7 @@ const IssueSidebar = ({ issue }) => {
           </div>
 
           <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
-            <p className="text-xs leading-relaxed text-slate-600 font-medium">
+            <p className="text-[11px] sm:text-xs leading-relaxed text-slate-600 font-medium">
               {issue.location?.address || "Exact address not provided"}
             </p>
           </div>
@@ -116,7 +118,7 @@ const IssueSidebar = ({ issue }) => {
         <div className="grid grid-cols-1 gap-3">
           <button
             onClick={handleShare}
-            className={`flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-sm font-bold transition-all border cursor-pointer
+            className={`flex items-center justify-center gap-2 w-full py-3 sm:py-3.5 rounded-xl text-sm font-bold transition-all border cursor-pointer
               ${
                 copied
                   ? "bg-emerald-50 border-emerald-200 text-emerald-600"

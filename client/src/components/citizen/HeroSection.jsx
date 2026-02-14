@@ -10,7 +10,7 @@ const HeroSection = () => {
   const { openSignIn } = useClerk();
 
   return (
-    <section className="relative min-h-95 w-full overflow-hidden rounded-2xl bg-slate-950 text-white shadow-2xl border border-white/5">
+    <section className="relative min-h-105 sm:min-h-95 w-full overflow-hidden rounded-2xl bg-slate-950 text-white shadow-2xl border border-white/5">
       <div className="absolute inset-0 z-0">
         <img
           src={cityHeroImg}
@@ -21,7 +21,7 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-transparent to-transparent" />
       </div>
 
-      <div className="relative z-10 flex h-full min-h-95 flex-col justify-center px-8 md:px-12 py-8">
+      <div className="relative z-10 flex h-full min-h-105 sm:min-h-95 flex-col justify-center px-5 sm:px-8 md:px-12 py-8">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -39,7 +39,7 @@ const HeroSection = () => {
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-tight">
             Better{" "}
             <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-emerald-400">
               Neighborhoods
@@ -47,7 +47,7 @@ const HeroSection = () => {
             Start With You.
           </h1>
 
-          <p className="max-w-lg text-sm md:text-base text-slate-400 leading-relaxed font-medium">
+          <p className="max-w-lg text-xs sm:text-sm md:text-base text-slate-400 leading-relaxed font-medium">
             JanSamadhan connects you directly with city authorities. Report
             issues and track maintenance in real-time.
           </p>
@@ -64,7 +64,7 @@ const HeroSection = () => {
                 }
                 navigate("/citizen/report"); // ✅ allowed
               }}
-              className="group relative flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-slate-950 transition-all hover:bg-emerald-50 cursor-pointer shadow-lg shadow-white/5"
+              className="group relative flex items-center gap-2 rounded-xl bg-white px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-bold text-slate-950 transition-all hover:bg-emerald-50 cursor-pointer shadow-lg shadow-white/5"
             >
               <PlusCircle
                 size={18}
@@ -81,7 +81,7 @@ const HeroSection = () => {
                 }
                 navigate("/citizen/my-issues");
               }}
-              className="flex items-center gap-2 rounded-xl cursor-pointer border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold backdrop-blur-md transition-all hover:bg-white/10"
+              className="flex items-center gap-2 rounded-xl cursor-pointer border border-white/10 bg-white/5 px-5 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold backdrop-blur-md transition-all hover:bg-white/10"
             >
               Track Progress
               <ArrowRight size={16} />
@@ -91,8 +91,8 @@ const HeroSection = () => {
       </div>
 
       {/* 3. Integrated Stats Row */}
-      <div className="absolute bottom-4 left-8 md:left-12 z-10">
-        <div className="flex items-center gap-6 text-[11px] font-bold uppercase tracking-widest text-slate-500">
+      <div className="absolute bottom-4 left-5 sm:left-8 md:left-12 z-10 right-5 sm:right-auto">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-500">
           <div className="flex items-center gap-2">
             <span className="text-white ml-3">12k+</span> Resolved
           </div>

@@ -19,18 +19,18 @@ const EvidenceUpload = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl border shadow-sm p-6">
+    <div className="bg-white rounded-xl border shadow-sm p-4 sm:p-6">
       <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100">
-          <ImagePlus size={20} className="text-emerald-600" />
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100">
+          <ImagePlus size={18} className="sm:w-5 sm:h-5" />
         </div>
         Visual Evidence
       </h3>
 
       {/* Upload box */}
-      <label className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer block hover:bg-gray-50">
-        <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-          <CloudUpload size={32} className="text-emerald-500" />
+      <label className="border-2 border-dashed rounded-lg p-6 sm:p-8 text-center cursor-pointer block hover:bg-gray-50">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+          <CloudUpload size={26} className="sm:w-8 sm:h-8" />
         </div>
         <p className="font-medium mt-2">Click to upload or drag and drop</p>
         <p className="text-xs text-gray-500">PNG, JPG up to 3MB</p>
@@ -50,7 +50,7 @@ const EvidenceUpload = () => {
           {issueDraft.images.map((img, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 p-3 border rounded-lg"
+              className="flex items-center gap-3 p-2.5 sm:p-3 border rounded-lg"
             >
               <img
                 src={URL.createObjectURL(img)}

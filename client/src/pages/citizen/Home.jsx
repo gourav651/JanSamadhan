@@ -36,12 +36,12 @@ const CitizenHome = () => {
       <div className="bg-slate-50/50">
         <CitizenNavbar />
 
-        <main className="max-w-360 mx-auto px-4 py-6 space-y-6">
+        <main className="max-w-360 w-full mx-auto px-4 sm:px-5 md:px-6 py-6 space-y-6">
           <HeroSection />
 
-          <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch">
             {/* 🗺️ MAP */}
-            <div className="relative lg:col-span-8 h-150 rounded-7xl overflow-hidden shadow-2xl shadow-slate-200 border border-white">
+            <div className="relative lg:col-span-8 min-h-87.5 sm:min-h-105 lg:h-150 rounded-3xl sm:rounded-7xl overflow-hidden shadow-2xl shadow-slate-200 border border-white">
               <MapPlaceholder
                 userLocation={location}
                 issues={issues}

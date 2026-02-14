@@ -52,9 +52,9 @@ const NearbyIssues = () => {
   return (
     <div className="bg-white rounded-3xl border border-slate-100 h-full flex flex-col shadow-xl shadow-slate-200/40 overflow-hidden">
       {/* HEADER */}
-      <div className="px-6 py-5 border-b border-emerald-50 bg-emerald-50/30 flex items-center justify-between">
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-emerald-50 bg-emerald-50/30 flex items-center justify-between">
         <div>
-          <h3 className="font-bold text-slate-800 text-lg tracking-tight">
+          <h3 className="font-bold text-slate-800 text-base sm:text-lg tracking-tight">
             Nearby Issues
           </h3>
           <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">
@@ -100,10 +100,10 @@ const NearbyIssues = () => {
                   navigate(`/citizen/issues/${issue._id}`);
                 }}
                 // THE GREENISH CARD STYLE
-                className="group relative flex gap-4 p-4 rounded-2xl transition-all cursor-pointer border border-emerald-100/50 bg-emerald-50/40 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-sm"
+                className="group relative flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl transition-all cursor-pointer border border-emerald-100/50 bg-emerald-50/40 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-sm"
               >
                 {/* Image Section */}
-                <div className="relative w-20 h-20 shrink-0 bg-white rounded-xl overflow-hidden border border-emerald-100 shadow-sm">
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-white rounded-xl overflow-hidden border border-emerald-100 shadow-sm">
                   <img
                     src={issue.images?.[0] || "https://via.placeholder.com/100"}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -114,7 +114,7 @@ const NearbyIssues = () => {
                 {/* Content Section */}
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
-                    <h4 className="font-bold text-slate-800 text-sm truncate group-hover:text-emerald-800 transition-colors">
+                    <h4 className="font-bold text-slate-800 text-xs sm:text-sm truncate group-hover:text-emerald-800 transition-colors">
                       {issue.title}
                     </h4>
                     <span
@@ -135,13 +135,13 @@ const NearbyIssues = () => {
                     </span>
                   </div>
 
-                  <p className="text-[12px] text-slate-600 leading-snug line-clamp-2 mb-3">
+                  <p className="text-[11px] sm:text-[12px] text-slate-600 leading-snug line-clamp-2 mb-3">
                     {issue.description}
                   </p>
 
                   {/* Interaction Pods */}
                   {/* Interaction Stats Pods */}
-                  <div className="flex gap-3 mt-3">
+                  <div className="flex flex-wrap gap-2 sm:gap-3 mt-3">
                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-emerald-100 text-[11px] font-bold text-emerald-800 shadow-sm">
                       <ThumbsUp size={12} className="text-blue-500" />
                       {issue.upvotes ?? 0}

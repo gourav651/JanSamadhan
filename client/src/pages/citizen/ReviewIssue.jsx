@@ -95,14 +95,14 @@ const CitizenReviewIssue = () => {
     <div className="min-h-screen bg-slate-50/50">
       <CitizenNavbar />
 
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-6xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="mb-10">
           <ReportStepper currentStep={3} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
           {/* LEFT COLUMN: Details & Location */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-8 space-y-6 sm:space-y-8">
             {/* Issue Details Card */}
             <div className="bg-white border-2 border-slate-900 rounded-4xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(15,23,42,0.05)]">
               <SectionHeader
@@ -110,8 +110,8 @@ const CitizenReviewIssue = () => {
                 icon={FileText}
                 editPath="/citizen/report"
               />
-              <div className="p-8 space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div className="p-5 sm:p-8 space-y-5 sm:space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
                   <div>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
                       Category
@@ -132,7 +132,7 @@ const CitizenReviewIssue = () => {
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
                     Issue Title
                   </p>
-                  <p className="text-xl font-bold text-slate-900">
+                  <p className="text-lg sm:text-xl font-bold text-slate-900">
                     {issueDraft.title}
                   </p>
                 </div>
@@ -141,7 +141,7 @@ const CitizenReviewIssue = () => {
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
                     Description
                   </p>
-                  <p className="text-slate-600 leading-relaxed font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <p className="text-slate-600 leading-relaxed font-medium bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-100">
                     {finalDescription}
                   </p>
                 </div>
@@ -162,7 +162,7 @@ const CitizenReviewIssue = () => {
                     lng={issueDraft.location.lng}
                   />
                 </div>
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
                     Pinpointed Address
                   </p>
@@ -184,7 +184,7 @@ const CitizenReviewIssue = () => {
                 icon={ImageIcon}
                 editPath="/citizen/report/location"
               />
-              <div className="p-6 grid grid-cols-2 gap-3">
+              <div className="p-4 sm:p-6 grid grid-cols-2 gap-2 sm:gap-3">
                 {issueDraft.images.map((img, index) => (
                   <div
                     key={index}
@@ -193,7 +193,7 @@ const CitizenReviewIssue = () => {
                     <img
                       src={URL.createObjectURL(img)}
                       alt="evidence"
-                      className="h-28 w-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="h-24 sm:h-28 w-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
                 ))}
@@ -201,11 +201,11 @@ const CitizenReviewIssue = () => {
             </div>
 
             {/* Submission Card */}
-            <div className="bg-white border-2 border-slate-900 rounded-4xl p-8 shadow-[6px_6px_0px_0px_rgba(15,23,42,0.05)]">
+            <div className="bg-white border-2 border-slate-900 rounded-4xl p-5 sm:p-8 shadow-[6px_6px_0px_0px_rgba(15,23,42,0.05)]">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200">
                 <CheckCircle2 size={32} />
               </div>
-              <h3 className="text-2xl font-black text-slate-900 mb-2">
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-2">
                 Ready to Submit?
               </h3>
               <p className="text-sm font-medium text-slate-500 mb-8 leading-relaxed">

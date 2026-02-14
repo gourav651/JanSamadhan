@@ -48,9 +48,9 @@ const CitizenIssueDetail = () => {
       {" "}
       {/* Subtle off-white background */}
       <CitizenNavbar />
-      <main className="max-w-7xl mx-auto px-6 py-10">
+     <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {/* Breadcrumb with Hover Effect */}
-        <div className="mb-10 flex items-center justify-between">
+        <div className="mb-6 sm:mb-10 flex flex-wrap items-center justify-between gap-4">
           <button
             onClick={() => navigate("/citizen/my-issues")}
             className="group flex items-center gap-2.5 px-4 py-2 rounded-full bg-white border border-slate-100 text-slate-500 shadow-sm hover:shadow-md hover:border-indigo-100 hover:text-indigo-600 transition-all duration-300 active:scale-95"
@@ -61,7 +61,7 @@ const CitizenIssueDetail = () => {
                 className="group-hover:-translate-x-1 transition-transform duration-300 ease-out"
               />
             </div>
-            <span className="text-sm font-bold tracking-tight pr-1 cursor-pointer">
+            <span className="text-xs sm:text-sm font-bold tracking-tight pr-1 cursor-pointer">
               Back to My Issues
             </span>
           </button>
@@ -73,12 +73,12 @@ const CitizenIssueDetail = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
           {/* LEFT COLUMN */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-2 space-y-8"
+            className="lg:col-span-2 space-y-6 sm:space-y-8"
           >
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-1 hover:shadow-md transition-shadow duration-300">
               <IssueHeader issue={issue} />
@@ -88,8 +88,8 @@ const CitizenIssueDetail = () => {
               <IssueEvidence images={issue.images} />
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow duration-300">
+             <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-4">
                 Activity Progress
               </h3>
               <IssueTimeline
@@ -108,7 +108,7 @@ const CitizenIssueDetail = () => {
             transition={{ delay: 0.1 }}
             className="lg:col-span-1"
           >
-            <div className="sticky top-8">
+           <div className="lg:sticky lg:top-8">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow duration-300">
                 <IssueSidebar issue={issue} />
               </div>

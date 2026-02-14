@@ -1,7 +1,7 @@
 const CitizenFooter = () => {
   return (
     <footer className="mt-12 border-t border-emerald-100/50 bg-emerald-50/20 py-8">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col items-center text-center md:flex-row md:justify-between md:text-left gap-6">
         <div>
           <span className="font-black text-emerald-800 tracking-tighter text-lg">
             JanSamadhan
@@ -11,7 +11,7 @@ const CitizenFooter = () => {
           </p>
         </div>
 
-        <div className="flex gap-8 text-xs font-bold text-slate-400 uppercase tracking-widest">
+        <div className="flex flex-wrap justify-center md:justify-start gap-6 sm:gap-8 text-xs font-bold text-slate-400 uppercase tracking-widest">
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="hover:text-emerald-600 transition-colors uppercase"

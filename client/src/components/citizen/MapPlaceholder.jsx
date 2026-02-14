@@ -36,7 +36,7 @@ const FitBounds = ({ userLocation, issues }) => {
 
 const MapPlaceholder = ({ userLocation, issues, loading }) => {
   const navigate = useNavigate();
-   const { isSignedIn } = useUser();
+  const { isSignedIn } = useUser();
   const { openSignIn } = useClerk();
 
   if (loading || !userLocation) {
@@ -53,8 +53,8 @@ const MapPlaceholder = ({ userLocation, issues, loading }) => {
   return (
     <div className="h-full w-full relative group">
       {/* Floating Label overlay */}
-      <div className="absolute top-4 left-4 z-400 bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border border-white/20 pointer-events-none">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-400 bg-white/90 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl shadow-lg border border-white/20 pointer-events-none">
+        <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">
           Active Zone
         </p>
         <p className="text-sm font-bold text-slate-800">Local Area Map</p>
@@ -93,17 +93,17 @@ const MapPlaceholder = ({ userLocation, issues, loading }) => {
             >
               <Popup>
                 <div
-                  className="p-1 min-w-37.5 cursor-pointer"
+                  className="p-1 min-w-35 max-w-55 sm:min-w-37.5 cursor-pointer"
                   // onClick={() => navigate(`/citizen/issues/${issue._id}`)}
                   onClick={() => {
-                if (!isSignedIn) {  
-                  openSignIn(); // 🔐 open login / register
-                  return;
-                }
-                navigate(`/citizen/issues/${issue._id}`); // ✅ allowed
-              }}
+                    if (!isSignedIn) {
+                      openSignIn(); // 🔐 open login / register
+                      return;
+                    }
+                    navigate(`/citizen/issues/${issue._id}`); // ✅ allowed
+                  }}
                 >
-                  <div className="w-full h-20 bg-slate-100 rounded-lg mb-2 overflow-hidden">
+                  <div className="w-full h-18 sm:h-20 bg-slate-100 rounded-lg mb-2 overflow-hidden">
                     <img
                       src={issue.images?.[0]}
                       className="w-full h-full object-cover"

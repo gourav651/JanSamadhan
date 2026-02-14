@@ -6,7 +6,7 @@ const ServiceCard = ({ title, description, icon: Icon, image, color }) => {
     <motion.div
       whileHover={{ y: -10, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300 }}
-      className="relative flex flex-col h-112.5 w-full bg-emerald-50 hover rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 transition-shadow duration-300"
+      className="relative flex flex-col min-h-95 sm:min-h-105 lg:h-112.5 w-full bg-emerald-50 rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-blue-500/10 transition-shadow duration-300"
     >
       {/* Top Image Section */}
       <div className="h-1/2 w-full overflow-hidden relative">
@@ -17,18 +17,18 @@ const ServiceCard = ({ title, description, icon: Icon, image, color }) => {
         />
         {/* Floating Icon Badge */}
         <div
-          className={`absolute bottom-4 left-4 p-3 rounded-2xl bg-white shadow-lg text-${color}-600`}
+          className={`absolute bottom-3 sm:bottom-4 left-3 sm:left-4 p-2.5 sm:p-3 rounded-2xl bg-white shadow-lg text-${color}-600`}
         >
-          <Icon size={24} strokeWidth={2.5} />
+          <Icon size={20} className="sm:w-6 sm:h-6" strokeWidth={2.5} />
         </div>
       </div>
 
       {/* Content Section */}
-      <div className="p-6 flex flex-col grow">
-        <h3 className="text-xl font-bold text-slate-800 mb-3 tracking-tight">
+      <div className="p-4 sm:p-6 flex flex-col grow">
+        <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-3 tracking-tight">
           {title}
         </h3>
-        <p className="text-slate-500 text-sm leading-relaxed line-clamp-4">
+        <p className="text-slate-500 text-xs sm:text-sm leading-relaxed line-clamp-4">
           {description}
         </p>
 
