@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const AuthorityManagement = () => {
   const [authorities, setAuthorities] = useState([]);
@@ -53,7 +54,7 @@ const AuthorityManagement = () => {
       setOpenMenuId(null);
     } catch (err) {
       console.error("Failed to update status", err);
-      alert("Failed to update authority status");
+      toast.error("Failed to update authority status");
     } finally {
       setLoadingId(null);
     }
@@ -80,7 +81,7 @@ const AuthorityManagement = () => {
 
       setEditAuthority(null);
     } catch (err) {
-      alert("Failed to update authority");
+      toast.error("Failed to update authority");
     }
   };
 
@@ -94,7 +95,7 @@ const AuthorityManagement = () => {
   const createAuthority = async () => {
     // ✅ FRONTEND VALIDATION
     if (!newClerkId || !newDepartment || !newArea) {
-      alert("All fields are required");
+      toast.error("All fields are required");
       return; // ⛔ stop here, don’t call API
     }
     try {
@@ -111,7 +112,7 @@ const AuthorityManagement = () => {
       setNewArea("");
       setPage(1); // go back to first page
     } catch (err) {
-      alert("Failed to create authority");
+      toast.error("User not found");
     }
   };
 
@@ -148,9 +149,9 @@ const AuthorityManagement = () => {
       <div className="grow p-6 md:p-10">
         <div className="max-w-7xl mx-auto flex flex-col gap-8">
           {/* ================= HEADER SECTION ================= */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div>
-              <h2 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white flex items-center gap-3">
                 <Shield className="text-blue-500" size={32} />
                 Authority Management
               </h2>
@@ -162,7 +163,7 @@ const AuthorityManagement = () => {
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-900/20 group cursor-pointer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-900/20 group cursor-pointer"
             >
               <Plus size={20} className="transition-transform" />
               Add New Authority
@@ -170,7 +171,7 @@ const AuthorityManagement = () => {
           </div>
 
           {/* ================= FILTERS BAR ================= */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60 shadow-xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-slate-800/60 shadow-xl relative z-0">
             {/* Enhanced Search */}
             <div className="lg:col-span-5 relative group">
               <Search
@@ -186,7 +187,7 @@ const AuthorityManagement = () => {
             </div>
 
             {/* Custom Selects */}
-            <div className="lg:col-span-7 flex flex-wrap items-center gap-4">
+            <div className="lg:col-span-7 flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-3 sm:gap-4">
               <div className="flex items-center gap-2 text-slate-500 mr-2">
                 <Filter size={16} />
                 <span className="text-xs font-bold uppercase tracking-widest">
@@ -229,7 +230,7 @@ const AuthorityManagement = () => {
                   setDepartmentFilter("");
                   setStatusFilter("");
                 }}
-                className="ml-auto text-xs font-bold text-blue-400 hover:text-blue-300 uppercase tracking-tighter transition-colors cursor-pointer"
+                className="sm:ml-auto text-xs font-bold text-blue-400 hover:text-blue-300 uppercase tracking-tighter transition-colors cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -237,146 +238,158 @@ const AuthorityManagement = () => {
           </div>
 
           {/* ================= DATA TABLE ================= */}
-          <div className="bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800/60 shadow-2xl overflow-visible">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-800/30 text-slate-400 border-b border-slate-800/60">
-                  <th className="px-8 py-5 text-left font-bold uppercase tracking-wider text-[11px]">
-                    Authority Official
-                  </th>
-                  <th className="px-6 py-5 text-left font-bold uppercase tracking-wider text-[11px]">
-                    Department
-                  </th>
-                  <th className="px-6 py-5 text-left font-bold uppercase tracking-wider text-[11px]">
-                    Jurisdiction
-                  </th>
-                  <th className="px-6 py-5 text-center font-bold uppercase tracking-wider text-[11px]">
-                    Status
-                  </th>
-                  <th className="px-8 py-5 text-right font-bold uppercase tracking-wider text-[11px]">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-800/40">
-                {authorities.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-8 py-20 text-center">
-                      <div className="flex flex-col items-center gap-3 opacity-40">
-                        <Shield size={48} />
-                        <p className="text-lg">No authority records found</p>
-                      </div>
-                    </td>
+          <div className="relative z-10 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-800/60 shadow-2xl overflow-visible">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-200 text-sm">
+                <thead>
+                  <tr className="bg-slate-800/30 text-slate-400 border-b border-slate-800/60">
+                    <th className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 text-left font-bold uppercase tracking-wider text-[11px]">
+                      Authority Official
+                    </th>
+                    <th className="px-6 py-5 text-left font-bold uppercase tracking-wider text-[11px]">
+                      Department
+                    </th>
+                    <th className="px-6 py-5 text-left font-bold uppercase tracking-wider text-[11px]">
+                      Jurisdiction
+                    </th>
+                    <th className="px-6 py-5 text-center font-bold uppercase tracking-wider text-[11px]">
+                      Status
+                    </th>
+                    <th className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5 text-right font-bold uppercase tracking-wider text-[11px]">
+                      Actions
+                    </th>
                   </tr>
-                ) : (
-                  authorities.map((auth) => (
-                    <tr
-                      key={auth._id}
-                      className="hover:bg-blue-500/2 transition-colors group"
-                    >
-                      <td className="px-8 py-5">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
-                            {(auth.name || auth.email).charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="font-bold text-slate-200 group-hover:text-blue-400 transition-colors">
-                              {auth.name || "N/A"}
-                            </div>
-                            <div className="text-xs text-slate-500 font-medium">
-                              {auth.email}
-                            </div>
-                          </div>
+                </thead>
+
+                <tbody className="divide-y divide-slate-800/40">
+                  {authorities.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-8 py-20 text-center">
+                        <div className="flex flex-col items-center gap-3 opacity-40">
+                          <Shield size={48} />
+                          <p className="text-lg">No authority records found</p>
                         </div>
-                      </td>
-
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <Briefcase size={14} className="text-blue-500/60" />
-                          {auth.department || "—"}
-                        </div>
-                      </td>
-
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2 text-slate-400">
-                          <MapPin size={14} className="text-emerald-500/60" />
-                          <span className="px-2 py-0.5 rounded-lg bg-emerald-500/5 text-emerald-400/80 text-[11px] font-bold border border-emerald-500/10">
-                            {auth.assignedArea || "Not Assigned"}
-                          </span>
-                        </div>
-                      </td>
-
-                      <td className="px-6 py-5 text-center">
-                        <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                            auth.status === "SUSPENDED"
-                              ? "bg-red-500/5 text-red-500 border-red-500/20"
-                              : auth.status === "ON_LEAVE"
-                                ? "bg-amber-500/5 text-amber-500 border-amber-500/20"
-                                : "bg-emerald-500/5 text-emerald-500 border-emerald-500/20"
-                          }`}
-                        >
-                          {auth.status || "Active"}
-                        </span>
-                      </td>
-
-                      <td className="px-8 py-5 text-right relative">
-                        <button
-                          onClick={() =>
-                            setOpenMenuId(
-                              openMenuId === auth._id ? null : auth._id,
-                            )
-                          }
-                          className="p-2 rounded-xl hover:bg-slate-800 transition-colors text-slate-500 hover:text-white cursor-pointer"
-                        >
-                          <MoreVertical size={18} />
-                        </button>
-
-                        {/* 🔽 ACTION MENU */}
-                        {openMenuId === auth._id && (
-                          <div
-                            ref={menuRef}
-                            className="absolute right-8 top-12 w-48 bg-[#030712] border border-slate-800 rounded-xl shadow-2xl z-50 py-2 animate-in fade-in zoom-in duration-200"
-                          >
-                            <button
-                              onClick={() => openEditModal(auth)}
-                              className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-blue-600 hover:text-white flex items-center gap-2 transition-colors"
-                            >
-                              Edit Details
-                            </button>
-                            <div className="h-px bg-slate-800 my-1 mx-2" />
-                            <button
-                              onClick={() => updateStatus(auth._id, "ACTIVE")}
-                              className="w-full text-left px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors"
-                            >
-                              Set Active
-                            </button>
-                            <button
-                              onClick={() => updateStatus(auth._id, "ON_LEAVE")}
-                              className="w-full text-left px-4 py-2 text-sm text-amber-400 hover:bg-amber-600 hover:text-white transition-colors"
-                            >
-                              Set On Leave
-                            </button>
-                            <button
-                              onClick={() =>
-                                updateStatus(auth._id, "SUSPENDED")
-                              }
-                              className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-600 hover:text-white transition-colors font-bold"
-                            >
-                              Suspend Official
-                            </button>
-                          </div>
-                        )}
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : (
+                    authorities.map((auth) => (
+                      <tr
+                        key={auth._id}
+                        className="hover:bg-blue-500/2 transition-colors group"
+                      >
+                        <td className="px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
+                              {(auth.name || auth.email)
+                                .charAt(0)
+                                .toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="font-bold text-slate-200 group-hover:text-blue-400 transition-colors">
+                                {auth.name || "N/A"}
+                              </div>
+                              <div className="text-xs text-slate-500 font-medium">
+                                {auth.email}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-2 text-slate-400">
+                            <Briefcase size={14} className="text-blue-500/60" />
+                            {auth.department || "—"}
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-5">
+                          <div className="flex items-center gap-2 text-slate-400">
+                            <MapPin size={14} className="text-emerald-500/60" />
+                            <span className="px-2 py-0.5 rounded-lg bg-emerald-500/5 text-emerald-400/80 text-[11px] font-bold border border-emerald-500/10">
+                              {auth.assignedArea || "Not Assigned"}
+                            </span>
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-5 text-center">
+                          <span
+                            className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                              auth.status === "SUSPENDED"
+                                ? "bg-red-500/5 text-red-500 border-red-500/20"
+                                : auth.status === "ON_LEAVE"
+                                  ? "bg-amber-500/5 text-amber-500 border-amber-500/20"
+                                  : "bg-emerald-500/5 text-emerald-500 border-emerald-500/20"
+                            }`}
+                          >
+                            {auth.status || "Active"}
+                          </span>
+                        </td>
+
+                        <td className="px-8 py-5 text-right relative">
+                          <button
+                            onClick={() =>
+                              setOpenMenuId(
+                                openMenuId === auth._id ? null : auth._id,
+                              )
+                            }
+                            className="p-2 rounded-xl hover:bg-slate-800 transition-colors text-slate-500 hover:text-white cursor-pointer"
+                          >
+                            <MoreVertical size={18} />
+                          </button>
+
+                          {/* 🔽 ACTION MENU */}
+                          {openMenuId === auth._id && (
+                            <div
+                              ref={menuRef}
+                              className="absolute right-4 sm:right-8 bottom-1 
+w-44 sm:w-48 
+top-0.5
+rounded-xl 
+shadow-2xl 
+py-2 
+animate-in fade-in zoom-in duration-200"
+                            >
+                              <button
+                                onClick={() => openEditModal(auth)}
+                                className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-blue-600 hover:text-white flex items-center gap-2 transition-colors"
+                              >
+                                Edit Details
+                              </button>
+                              <div className="h-px bg-slate-800 my-1 mx-2" />
+                              <button
+                                onClick={() => updateStatus(auth._id, "ACTIVE")}
+                                className="w-full text-left px-4 py-2 text-sm text-emerald-400 hover:bg-emerald-600 hover:text-white transition-colors"
+                              >
+                                Set Active
+                              </button>
+                              <button
+                                onClick={() =>
+                                  updateStatus(auth._id, "ON_LEAVE")
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-amber-400 hover:bg-amber-600 hover:text-white transition-colors"
+                              >
+                                Set On Leave
+                              </button>
+                              <button
+                                onClick={() =>
+                                  updateStatus(auth._id, "SUSPENDED")
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-600 hover:text-white transition-colors font-bold"
+                              >
+                                Suspend Official
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
 
             {/* ================= PAGINATION ================= */}
-            <div className="flex items-center justify-between px-8 py-5 border-t border-slate-800/60 bg-slate-900/20">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 sm:px-8 py-4 sm:py-5 border-t border-slate-800/60 bg-slate-900/20">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
                 Page {page} <span className="text-slate-700 mx-1">/</span>{" "}
                 {totalPages}
@@ -405,7 +418,7 @@ const AuthorityManagement = () => {
         {/* ================= MODALS (Simplified for brevity, but applied dark theme) ================= */}
         {(editAuthority || showAddModal) && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-100 p-4">
-            <div className="bg-[#0b1120] border border-slate-800 rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="bg-[#0b1120] border border-slate-800 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-200">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-black text-white">
                   {editAuthority ? "Edit Official" : "Register Official"}

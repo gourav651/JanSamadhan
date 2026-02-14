@@ -39,15 +39,15 @@ const AdminSupportTickets = () => {
 
   return (
     <div className="min-h-screen w-full bg-[#0b1120] text-slate-200 flex flex-col font-sans">
-      <div className="grow p-6 md:p-10">
+      <div className="grow p-4 sm:p-6 md:p-10">
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
           <div className="mb-8">
-            <h1 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white flex items-center gap-3">
               <Ticket className="text-blue-500" size={32} />
               Support Tickets
             </h1>
-            <p className="text-slate-400 mt-2 text-lg">
+            <p className="text-slate-400 mt-2 text-sm sm:text-base lg:text-lg">
               Manage and resolve citizen inquiries and technical issues.
             </p>
           </div>
@@ -70,22 +70,22 @@ const AdminSupportTickets = () => {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-187.5 text-sm">
                   <thead>
                     <tr className="bg-slate-800/30 text-slate-400 border-b border-slate-800/60">
-                      <th className="px-8 py-5 text-left font-bold uppercase tracking-wider text-[11px]">
+                      <th className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-left font-bold uppercase tracking-wider text-[11px]">
                         Title
                       </th>
-                      <th className="px-6 py-5 text-left font-bold uppercase tracking-wider text-[11px]">
+                      <th className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-left font-bold uppercase tracking-wider text-[11px]">
                         Raised By
                       </th>
-                      <th className="px-6 py-5 text-center font-bold uppercase tracking-wider text-[11px]">
+                      <th className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-center font-bold uppercase tracking-wider text-[11px]">
                         Priority
                       </th>
-                      <th className="px-6 py-5 text-center font-bold uppercase tracking-wider text-[11px]">
+                      <th className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-center font-bold uppercase tracking-wider text-[11px]">
                         Status
                       </th>
-                      <th className="px-8 py-5 text-right font-bold uppercase tracking-wider text-[11px]">
+                      <th className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-right font-bold uppercase tracking-wider text-[11px]">
                         Action
                       </th>
                     </tr>
@@ -97,7 +97,7 @@ const AdminSupportTickets = () => {
                         key={t._id}
                         className="hover:bg-blue-500/5 transition-colors group"
                       >
-                        <td className="px-8 py-5 font-bold text-slate-200 group-hover:text-blue-400 transition-colors">
+                        <td className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 font-bold text-slate-200 group-hover:text-blue-400 transition-colors">
                           {t.title}
                         </td>
                         <td className="px-6 py-5 text-slate-400 font-medium">
@@ -138,13 +138,13 @@ const AdminSupportTickets = () => {
                           </span>
                         </td>
 
-                        <td className="px-8 py-5 text-right">
+                        <td className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5 text-right">
                           <select
                             value={t.status}
                             onChange={(e) =>
                               updateStatus(t._id, e.target.value)
                             }
-                            className="bg-[#030712] border border-slate-700/50 text-slate-300 px-3 py-1.5 rounded-xl text-xs outline-none focus:border-blue-500/50 cursor-pointer hover:bg-slate-900 transition-colors"
+                            className="w-full sm:w-auto bg-[#030712] border border-slate-700/50 text-slate-300 px-2 sm:px-3 py-1.5 rounded-xl text-xs outline-none focus:border-blue-500/50 cursor-pointer hover:bg-slate-900 transition-colors"
                           >
                             <option value="OPEN">Open</option>
                             <option value="IN_PROGRESS">In Progress</option>

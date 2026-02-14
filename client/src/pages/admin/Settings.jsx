@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../lib/axios";
 import { UserButton, useUser } from "@clerk/clerk-react";
+import { toast } from "sonner";
 import {
   Settings,
   ShieldCheck,
@@ -100,18 +101,18 @@ const AdminSettings = () => {
   return (
     <div className="bg-[#0b0f1a] text-slate-200 font-sans min-h-screen flex flex-col selection:bg-blue-500/30">
       {/* HEADER - Updated to Dark Glassmorphism */}
-      <header className="h-20 flex items-center justify-between px-8 bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-800/60 sticky top-0 z-50">
+      <header className="h-16 sm:h-20 flex items-center justify-between px-4 sm:px-8 bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-800/60 sticky top-0 z-20">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <div className="bg-linear-to-br from-blue-600 to-indigo-700 p-2 rounded-xl shadow-lg shadow-blue-900/20">
               <Settings size={22} className="text-white" />
             </div>
-            <h1 className="text-xl font-black tracking-tight text-white uppercase">
+            <h1 className="text-sm sm:text-xl font-black tracking-tight text-white uppercase">
               Civic<span className="text-blue-500">Admin</span>
             </h1>
           </div>
           <div className="h-6 w-px bg-slate-800" />
-          <h2 className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+          <h2 className="hidden sm:block text-sm font-bold text-slate-400 uppercase tracking-widest">
             System Architecture
           </h2>
         </div>
@@ -127,7 +128,7 @@ const AdminSettings = () => {
         </div>
       </header>
 
-      <main className="flex-1 max-w-6xl mx-auto w-full p-8 space-y-10">
+      <main className="flex-1 max-w-6xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-8 sm:space-y-10">
         {/* PROFILE SECTION */}
         <section className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-3xl overflow-hidden shadow-2xl">
           <div className="px-8 py-6 border-b border-slate-800/60 flex items-center gap-4 bg-slate-800/20">
@@ -144,10 +145,13 @@ const AdminSettings = () => {
             </div>
           </div>
 
-          <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
             <div className="flex flex-col items-center justify-center space-y-4">
               <div className="relative group">
-                <div className="w-40 h-40 rounded-3xl overflow-hidden border-4 border-slate-800 bg-slate-900 shadow-2xl relative z-10">
+                <div
+                  className="w-28 h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-40
+ rounded-3xl overflow-hidden border-4 border-slate-800 bg-slate-900 shadow-2xl relative z-10"
+                >
                   {profile?.profileImage ? (
                     <img
                       src={profile.profileImage}
@@ -243,13 +247,33 @@ const AdminSettings = () => {
             </h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-150">
               <thead>
                 <tr className="bg-slate-950/50 text-[10px] uppercase font-black tracking-[0.2em] text-slate-500 border-b border-slate-800/60">
-                  <th className="px-8 py-5 text-left">Entity Role</th>
-                  <th className="px-8 py-5 text-center">Read</th>
-                  <th className="px-8 py-5 text-center">Write</th>
-                  <th className="px-8 py-5 text-center">Analytics</th>
+                  <th
+                    className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-left"
+                  >
+                    Entity Role
+                  </th>
+                  <th
+                    className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-center"
+                  >
+                    Read
+                  </th>
+                  <th
+                    className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-center"
+                  >
+                    Write
+                  </th>
+                  <th
+                    className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-center"
+                  >
+                    Analytics
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/40">
@@ -277,8 +301,11 @@ const AdminSettings = () => {
         </section>
 
         {/* BOTTOM GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <section className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 p-8 rounded-3xl space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          <section
+            className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 p-4 sm:p-6 lg:p-8
+ rounded-3xl space-y-6"
+          >
             <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
               <Bell size={16} className="text-amber-500" /> Communications
             </h3>
@@ -301,11 +328,14 @@ const AdminSettings = () => {
             </div>
           </section>
 
-          <section className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 p-8 rounded-3xl">
+          <section
+            className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 p-4 sm:p-6 lg:p-8
+ rounded-3xl"
+          >
             <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2 mb-8">
               <Activity size={16} className="text-blue-500" /> Core Performance
             </h3>
-            <div className="grid grid-cols-2 gap-y-8 gap-x-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-y-6 sm:gap-y-8 gap-x-4">
               <DarkStat
                 label="Registered Nodes"
                 value="12.5k"
@@ -327,7 +357,7 @@ const AdminSettings = () => {
         </div>
 
         {/* ACTION BAR */}
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/60 p-6 rounded-[2.5rem] flex flex-col md:flex-row justify-between items-center gap-6 shadow-2xl">
+        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800/60 p-6 rounded-[2.5rem] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 sm:gap-6">
           <button
             onClick={handleReset}
             className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-rose-400 transition-colors uppercase tracking-widest cursor-pointer"
@@ -336,24 +366,24 @@ const AdminSettings = () => {
           </button>
 
           <div className="flex items-center gap-4">
-            <button className="px-8 py-3 text-sm font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest cursor-pointer">
+            <button className="w-full sm:w-auto px-6 sm:px-8 py-3 text-sm font-bold text-slate-400 hover:text-white transition-colors uppercase tracking-widest cursor-pointer">
               Cancel
             </button>
             <button
               onClick={async () => {
                 if (passwords.newPassword && passwords.newPassword.length < 6)
-                  return alert("Password too short");
+                  return toast.error("Password too short");
                 if (passwords.newPassword !== passwords.confirmPassword)
-                  return alert("Mismatch");
+                  return toast.error("Password mismatch");
                 localStorage.setItem(
                   "admin_ui_password",
                   passwords.newPassword,
                 );
                 await handleSaveProfile();
                 await handleSave();
-                alert("Encrypted & Saved");
+                toast.error("Encrypted and saved");
               }}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-900/20 flex items-center gap-3 transition-all hover:-translate-y-1 active:scale-95 cursor-pointer"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-6 sm:px-10 py-3 sm:py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-900/20 flex items-center gap-3 transition-all hover:-translate-y-1 active:scale-95 cursor-pointer"
             >
               <Save size={16} /> Push Changes
             </button>
@@ -404,19 +434,31 @@ const PasswordField = ({ value, placeholder, show, toggle, onChange }) => (
 
 const PermissionRow = ({ role, desc, read, write, analytics }) => (
   <tr className="hover:bg-slate-800/20 transition-colors">
-    <td className="px-8 py-5">
+    <td
+      className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+"
+    >
       <div className="font-bold text-white text-sm">{role}</div>
       <div className="text-[10px] text-slate-500 uppercase tracking-wider">
         {desc}
       </div>
     </td>
-    <td className="px-8 py-5 text-center">
+    <td
+      className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-center"
+    >
       {read ? <CheckIcon color="text-emerald-500" /> : <Dash />}
     </td>
-    <td className="px-8 py-5 text-center">
+    <td
+      className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-center"
+    >
       {write ? <CheckIcon color="text-emerald-500" /> : <Dash />}
     </td>
-    <td className="px-8 py-5 text-center">
+    <td
+      className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-center"
+    >
       {analytics ? <CheckIcon color="text-emerald-500" /> : <Dash />}
     </td>
   </tr>
@@ -442,7 +484,12 @@ const DarkNotificationRow = ({ title, status, color }) => (
 
 const DarkStat = ({ label, value, color }) => (
   <div>
-    <p className={`text-4xl font-black ${color} tracking-tighter`}>{value}</p>
+    <p
+      className={`text-3xl sm:text-4xl
+font-black ${color} tracking-tighter`}
+    >
+      {value}
+    </p>
     <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mt-1">
       {label}
     </p>

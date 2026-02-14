@@ -78,23 +78,23 @@ const AdminAnalytics = () => {
   );
 
   return (
-    <div className="min-h-screen w-full bg-[#0b1120] text-slate-200 flex flex-col p-6 font-sans">
+    <div className="min-h-screen w-full bg-[#0b1120] text-slate-200 flex flex-col p-4 sm:p-6 font-sans">
       <div className="grow p-2 md:p-1">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* ================= HEADER ================= */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white flex items-center gap-3">
                 <Activity className="text-blue-500" size={32} />
                 Analytics & Insights
               </h1>
-              <p className="text-slate-400 mt-2 text-lg">
+              <p className="text-slate-400 mt-2 text-sm sm:text-base lg:text-lg">
                 Executive Performance Tracking & Civic Metrics
               </p>
             </div>
             <button
               onClick={handleDownloadReport}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-95 cursor-pointer"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600hover:bg-blue-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-95 cursor-pointer"
             >
               <Download size={18} />
               Export Data
@@ -166,7 +166,10 @@ const AdminAnalytics = () => {
           {/* ================= CHARTS ROW ================= */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Issue Trends Chart */}
-            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 p-8 rounded-3xl shadow-2xl">
+            <div
+              className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 p-4 sm:p-6 lg:p-8
+ rounded-3xl shadow-2xl"
+            >
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <TrendingUp size={20} className="text-blue-500" /> Issue
@@ -185,7 +188,7 @@ const AdminAnalytics = () => {
                 </div>
               </div>
 
-              <div className="h-72">
+              <div className="h-60 sm:h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={trendData}>
                     <defs>
@@ -255,7 +258,10 @@ const AdminAnalytics = () => {
             </div>
 
             {/* Departmental Load Chart */}
-            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 p-8 rounded-3xl shadow-2xl">
+            <div
+              className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 p-4 sm:p-6 lg:p-8
+ rounded-3xl shadow-2xl"
+            >
               <div className="flex items-center justify-between mb-8">
                 <h3 className="text-lg font-bold text-white">
                   Departmental Load
@@ -307,13 +313,13 @@ const AdminAnalytics = () => {
 
           {/* ================= PERFORMANCE TABLE ================= */}
           <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/60 rounded-3xl overflow-hidden shadow-2xl">
-            <div className="p-8 border-b border-slate-800/60 flex items-center justify-between">
+            <div className="p-4 sm:p-6 lg:p-8 border-b border-slate-800/60 flex items-center justify-between">
               <h3 className="text-xl font-bold text-white">
                 Authority Performance Leaderboard
               </h3>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full min-w-200 text-left">
                 <thead>
                   <tr className="bg-slate-800/30 text-slate-500">
                     {[
@@ -325,7 +331,8 @@ const AdminAnalytics = () => {
                     ].map((h) => (
                       <th
                         key={h}
-                        className="px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em]"
+                        className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-[11px] font-black uppercase tracking-[0.2em]"
                       >
                         {h}
                       </th>
@@ -338,13 +345,22 @@ const AdminAnalytics = () => {
                       key={a.authorityName}
                       className="hover:bg-blue-500/5 transition-colors group"
                     >
-                      <td className="px-8 py-5 font-bold text-white group-hover:text-blue-400">
+                      <td
+                        className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ font-bold text-white group-hover:text-blue-400"
+                      >
                         {a.authorityName}
                       </td>
-                      <td className="px-8 py-5 text-slate-400">
+                      <td
+                        className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-slate-400"
+                      >
                         {a.department}
                       </td>
-                      <td className="px-8 py-5">
+                      <td
+                        className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+"
+                      >
                         <div className="flex items-center gap-3">
                           <span className="text-white font-mono">
                             {a.resolvedPercent}%
@@ -357,10 +373,16 @@ const AdminAnalytics = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-5 text-slate-400 font-mono">
+                      <td
+                        className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+ text-slate-400 font-mono"
+                      >
                         {a.avgResolutionDays}d
                       </td>
-                      <td className="px-8 py-5">
+                      <td
+                        className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-5
+"
+                      >
                         <span
                           className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest border ${
                             a.resolvedPercent >= 85
@@ -385,7 +407,7 @@ const AdminAnalytics = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="p-6 border-t border-slate-800/60 flex items-center justify-center gap-4">
+              <div className="p-4 sm:p-6 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                   disabled={currentPage === 1}

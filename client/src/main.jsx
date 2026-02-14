@@ -7,6 +7,7 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import "leaflet/dist/leaflet.css";
 import "./index.css";
 import SocketProvider from "./providers/SocketProvider.jsx";
+import { Toaster } from "sonner";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -21,6 +22,7 @@ createRoot(document.getElementById("root")).render(
         <BrowserRouter>
           <IssueProvider>
             <App />
+            <Toaster richColors position="top-right" closeButton />
           </IssueProvider>
         </BrowserRouter>
       </SocketProvider>

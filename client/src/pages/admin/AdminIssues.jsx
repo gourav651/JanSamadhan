@@ -20,6 +20,7 @@ import { X } from "lucide-react";
 import { ShieldCheck, ChevronDown, UserPlus } from "lucide-react";
 import { Search } from "lucide-react";
 import { Info } from "lucide-react";
+import { toast } from "sonner";
 
 const TIMELINE_STEPS = ["REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED"];
 
@@ -56,7 +57,7 @@ const AdminIssues = () => {
 
       const issuesRes = await fetchAllIssues({
         page,
-        limit: 15,
+        limit: 6,
         ...filters,
       });
 
@@ -93,7 +94,7 @@ const AdminIssues = () => {
 
       const res = await fetchAllIssues({
         page,
-        limit: 15,
+        limit: 6,
         ...filters,
       });
 
@@ -105,7 +106,7 @@ const AdminIssues = () => {
         err.response?.data?.message ||
         "Cannot assign this issue. Please try again.";
 
-      alert(message); // ✅ popup for RESOLVED issue case
+      toast.error("Resolved issue cannot be reassigned !");
     }
   };
 
@@ -127,11 +128,11 @@ const AdminIssues = () => {
   };
 
   return (
-    <div className="dark bg-[#030712] text-slate-200 h-full flex overflow-hidden font-display">
+    <div className="dark bg-[#030712] text-slate-200 h-screen flex flex-col font-display overflow-hidden">
       {/* ================= MAIN CONTENT ================= */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         {/* Header Update */}
-        <header className="h-16 flex items-center justify-between px-6 border-b border-slate-800/50 bg-[#030712]/80 backdrop-blur-md z-20">
+        <header className="h-16 flex items-center justify-between px-6 border-b border-slate-800/50 bg-[#030712]/80 backdrop-blur-md z-0">
           <div className="flex items-center gap-4">
             <h2 className="text-white text-xl font-bold tracking-tight">
               Issues Management
@@ -144,12 +145,12 @@ const AdminIssues = () => {
         </header>
 
         {/* ================= BODY ================= */}
-        <div className="flex-1 overflow-hidden flex">
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative h-full">
           {/* ================= TABLE SECTION ================= */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden h-full">
             {/* Filters */}
-            <div className="p-4 border-b border-slate-800 flex flex-wrap items-center gap-3">
-              <div className="flex-1 min-w-75 relative">
+            <div className="p-4 border-b border-slate-800 flex flex-col lg:flex-row gap-3">
+              <div className="w-full lg:flex-1 relative">
                 <Search
                   size={18}
                   strokeWidth={2}
@@ -166,7 +167,7 @@ const AdminIssues = () => {
                 />
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center">
                 <select
                   value={status}
                   onChange={(e) => {
@@ -250,11 +251,11 @@ const AdminIssues = () => {
             </div>
 
             {/* Table */}
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-y-auto">
               <table className="w-full min-w-250 text-left border-collapse">
                 {/* Table Header */}
                 {/* Table Header */}
-                <thead className="sticky top-0 bg-[#030712] border-b border-slate-800 z-10">
+                <thead className="sticky top-0 bg-[#030712] border-b border-slate-800 z-0">
                   <tr>
                     {[
                       "Issue ID",
@@ -348,7 +349,7 @@ const AdminIssues = () => {
             {/* Pagination (UI only for now) */}
             <div className="px-6 py-4 border-t border-slate-800 bg-[#0f172a] flex items-center justify-between">
               <span className="text-xs text-slate-500 font-medium">
-                Showing 1–15 of {issues.length} issues
+                Showing page {page} of {totalPages}
               </span>
 
               <div className="flex gap-2">
@@ -372,11 +373,29 @@ const AdminIssues = () => {
           </div>
 
           {/* ================= RIGHT DETAILS PANEL ================= */}
-          <div className="w-105 border-l border-slate-800/60 flex flex-col bg-[#0b1120] shadow-[-20px_0_50px_rgba(0,0,0,0.5)] z-30">
+          <div
+            className={`
+    fixed top-3 right-0 bottom-0 w-full bg-[#0b1120]
+    transform transition-transform duration-300 ease-in-out
+    ${activeIssue ? "translate-x-0" : "translate-x-full"}
+
+    lg:relative
+lg:z-30
+lg:w-105
+lg:self-stretch
+lg:h-auto
+lg:translate-x-0
+lg:border-l lg:border-slate-800/60
+lg:shadow-[-20px_0_50px_rgba(0,0,0,0.5)]
+flex flex-col
+
+
+  `}
+          >
             {activeIssue ? (
               <>
                 {/* Panel Header */}
-                <div className="p-6 border-b border-slate-800/50 flex items-center justify-between bg-slate-900/20">
+                <div className="p-6 border-b border-slate-800/50 flex items-center justify-between bg-slate-900/20 sticky top-12 z-30">
                   <div>
                     <h3 className="text-white font-bold text-lg tracking-tight">
                       Issue Details
