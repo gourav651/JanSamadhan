@@ -54,8 +54,6 @@ const AuthMapView = () => {
     const loadAllIssues = async () => {
       try {
         setLoading(true);
-        const token = await getToken();
-
         const res = await axios.get("/api/authority/issues/map", {
           params: {
             lat: mapCenter[0],
@@ -74,7 +72,7 @@ const AuthMapView = () => {
     };
 
     loadAllIssues();
-  }, [mapCenter, getToken]);
+  }, [mapCenter]);
 
   useEffect(() => {
     if (!selectedIssue) return;
