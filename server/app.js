@@ -6,15 +6,15 @@ import authorityRoutes from "./routes/authority.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import supportRoutes from "./routes/support.routes.js";
-import notificationRoutes from './routes/notificationRoutes.js';
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: [process.env.CLIENT_URL],
     credentials: true,
-  })
+  }),
 );
 
 // 🔥 REQUIRED for multer text fields
