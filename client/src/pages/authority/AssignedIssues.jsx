@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion"; // For smooth animation
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 import IssueCard from "../../components/authority/IssueCard";
 import axios from "axios";
+import { ChevronDown } from "lucide-react";
 
 const AuthAssignedIssues = () => {
   const { getToken } = useAuth();
@@ -47,24 +48,24 @@ const AuthAssignedIssues = () => {
   return (
     <AuthorityLayout>
       <div className="min-h-screen bg-[#0f172a] text-slate-200 flex flex-col">
-        <div className="max-w-5xl mx-auto px-6 py-12 flex-1 w-full">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-1 w-full">
           {/* HEADER & FILTERS */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 sm:gap-8 mb-8 sm:mb-12">
             <div>
               <motion.h1
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="text-4xl font-black tracking-tight text-white mb-3"
+                className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white mb-2 sm:mb-3"
               >
                 Assigned <span className="text-blue-500">Issues</span>
               </motion.h1>
-              <p className="text-slate-400 text-lg flex items-center gap-2">
+              <p className="text-slate-400 text-sm sm:text-base lg:text-lg flex items-center gap-2">
                 <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
                 {issues.length} tasks require your attention
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-stretch sm:items-center gap-3 w-full lg:w-auto">
               {[
                 {
                   label: "Category",
@@ -86,18 +87,40 @@ const AuthAssignedIssues = () => {
                   ],
                 },
               ].map((filter, idx) => (
-                <select
-                  key={idx}
-                  onChange={(e) => filter.state(e.target.value)}
-                  className="h-11 px-4 rounded-xl border border-slate-700 bg-slate-800/50 text-slate-300 text-sm font-semibold focus:ring-2 focus:ring-blue-500/50 outline-none hover:bg-slate-800 transition-all cursor-pointer"
-                >
-                  <option value="">{filter.label}</option>
-                  {filter.options.map((opt) => (
-                    <option key={opt.v || opt} value={opt.v || opt}>
-                      {opt.l || opt}
+                <div key={idx} className="relative w-full sm:w-auto">
+                  <select
+                    onChange={(e) => filter.state(e.target.value)}
+                    className="h-11 w-full px-4 pr-10 rounded-xl 
+      bg-[#0f172a] text-slate-200
+      border border-slate-700
+      focus:ring-2 focus:ring-blue-500/50
+      outline-none
+      appearance-none
+      cursor-pointer
+      hover:border-slate-600 transition-all"
+                  >
+                    <option value="" className="bg-[#0f172a] text-slate-300">
+                      {filter.label}
                     </option>
-                  ))}
-                </select>
+                    {filter.options.map((opt) => (
+                      <option
+                        key={opt.v || opt}
+                        value={opt.v || opt}
+                        className="bg-[#0f172a] text-slate-200"
+                      >
+                        {opt.l || opt}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Custom Arrow Icon */}
+                  <ChevronDown
+                    size={18}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 
+  text-slate-500 pointer-events-none 
+  peer-focus:rotate-180 transition-transform"
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -121,7 +144,7 @@ const AuthAssignedIssues = () => {
               </p>
             </motion.div>
           ) : (
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4 sm:gap-5">
               <AnimatePresence mode="popLayout">
                 {issues.map((issue, index) => (
                   <motion.div
@@ -142,11 +165,11 @@ const AuthAssignedIssues = () => {
 
           {/* PAGINATION */}
           {totalPages > 1 && (
-            <div className="flex justify-between items-center mt-12 pt-8 border-t border-slate-800/60">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-0 mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-800/60">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="px-6 py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold text-xs uppercase tracking-widest disabled:opacity-20 hover:bg-slate-700 transition-all border border-slate-700"
+                className="w-full sm:w-auto px-6 py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold text-xs uppercase tracking-widest disabled:opacity-20 hover:bg-slate-700 transition-all border border-slate-700"
               >
                 Previous
               </button>
@@ -166,7 +189,7 @@ const AuthAssignedIssues = () => {
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                className="px-6 py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold text-xs uppercase tracking-widest disabled:opacity-20 hover:bg-slate-700 transition-all border border-slate-700"
+                className="w-full sm:w-auto px-6 py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold text-xs uppercase tracking-widest disabled:opacity-20 hover:bg-slate-700 transition-all border border-slate-700"
               >
                 Next
               </button>
@@ -175,8 +198,8 @@ const AuthAssignedIssues = () => {
         </div>
 
         {/* FOOTER - ADDED HERE */}
-        <footer className="mt-auto px-8 py-8 border-t border-slate-800/50">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <footer className="mt-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 border-t border-slate-800/50">
+          <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 rounded bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white">
                 J

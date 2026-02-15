@@ -67,7 +67,7 @@ const AuthSettings = () => {
 
   return (
     <AuthorityLayout>
-      <main className="flex justify-center py-10 px-6 bg-[#0B0F1A] text-slate-200 min-h-screen">
+      <main className="flex justify-center py-8 sm:py-10 px-4 sm:px-6 lg:px-8 bg-[#0B0F1A] text-slate-200 min-h-screen">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -75,8 +75,8 @@ const AuthSettings = () => {
           className="max-w-4xl w-full flex flex-col gap-8"
         >
           {/* PAGE HEADER */}
-          <div className="px-4 border-l-4 border-blue-600 pl-6">
-            <h1 className="text-3xl font-black text-white tracking-tight uppercase">
+          <div className="px-2 sm:px-4 border-l-4 border-blue-600 pl-4 sm:pl-6">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight uppercase">
               System <span className="text-blue-500">Settings</span>
             </h1>
             <p className="text-slate-500 mt-2 font-medium">
@@ -88,7 +88,7 @@ const AuthSettings = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
             {/* PROFILE INFO */}
             <SettingsCard title="Identity Profile" icon={<User size={20} />}>
               <div className="space-y-4">
@@ -122,7 +122,7 @@ const AuthSettings = () => {
           </div>
 
           {/* PLATFORM CONNECTIVITY */}
-          <section className="bg-[#0F172A]/50 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-2xl">
+          <section className="bg-[#0F172A]/50 border border-white/5 rounded-2xl sm:rounded-3xl p-5 sm:p-8 backdrop-blur-xl shadow-2xl">
             <div className="flex items-center gap-4 mb-8">
               <div className="p-3 bg-blue-500/10 rounded-2xl">
                 <Network className="text-blue-500" />
@@ -160,7 +160,7 @@ const AuthSettings = () => {
           </section>
 
           {/* LOGOUT */}
-          <div className="flex justify-between items-center px-4 py-8 border-t border-white/5 mt-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-0 px-2 sm:px-4 py-8 border-t border-white/5 mt-4 text-center sm:text-left">
             <p className="text-[10px] text-slate-600 font-bold tracking-[0.2em]">
               JanSamadhan Protocol v2.4.0
             </p>
@@ -171,7 +171,19 @@ const AuthSettings = () => {
                   boxShadow: "0 0 20px rgba(239, 68, 68, 0.2)",
                 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 text-red-500 px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-red-500 hover:text-white transition-all duration-300 cursor-pointer"
+                className="
+flex items-center gap-2 sm:gap-3
+bg-red-500/10 border border-red-500/20 text-red-500
+px-4 sm:px-8
+py-2.5 sm:py-4
+rounded-xl sm:rounded-2xl
+font-black uppercase
+text-[10px] sm:text-xs
+tracking-widest
+hover:bg-red-500 hover:text-white
+transition-all duration-300
+cursor-pointer
+"
               >
                 <LogOut size={16} />
                 Deactivate Session
@@ -181,7 +193,7 @@ const AuthSettings = () => {
 
           {/* FOOTER */}
           <footer className="mt-auto pt-12 pb-8 border-t border-white/5">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
               {/* BRANDING */}
               <div className="flex items-center gap-3 group cursor-pointer">
                 <div className="h-7 w-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-black text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] group-hover:scale-110 transition-transform">
@@ -199,7 +211,7 @@ const AuthSettings = () => {
               </p>
 
               {/* LINKS */}
-              <div className="flex gap-8">
+              <div className="flex flex-wrap justify-center md:justify-start gap-6 sm:gap-8">
                 <button className="text-[10px] text-slate-500 hover:text-blue-400 transition-all uppercase font-black tracking-widest">
                   Privacy Protocol
                 </button>

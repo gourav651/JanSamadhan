@@ -151,7 +151,7 @@ const AuthMapView = () => {
 
   return (
     <AuthorityLayout>
-      <div className="relative w-full h-screen overflow-hidden bg-[#0b0f14] font-display">
+      <div className="relative w-full h-dvh overflow-hidden bg-[#0b0f14] font-display">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400 z-50">
             Loading map data…
@@ -167,7 +167,7 @@ const AuthMapView = () => {
         {/* ================= HEADER ================= */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute top-6 left-6 z-40"
+          className="absolute top-20 sm:top-6 left-4 sm:left-6 z-40"
         >
           <div className="bg-[#111827]/90 backdrop-blur-xl px-5 py-3 mt-15 rounded-xl border border-white/10 shadow-lg">
             <h2 className="text-sm font-bold text-white">
@@ -182,9 +182,9 @@ const AuthMapView = () => {
         {/* ================= FILTER BAR ================= */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute top-6 right-6 z-40"
+          className="absolute top-16 sm:top-6 left-0 right-0 sm:left-auto sm:right-6 z-40 px-3 sm:px-0"
         >
-          <div className="flex items-center gap-3 bg-[#111827]/80 backdrop-blur-xl px-4 py-2.5 rounded-2xl border border-white/10">
+          <div className="flex items-center gap-2 bg-[#111827]/90 backdrop-blur-xl px-3 py-2 rounded-xl border border-white/10 shadow-lg">
             {/* Styled Dropdown Wrapper */}
             {[
               {
@@ -213,7 +213,7 @@ const AuthMapView = () => {
                 suffix: " km",
               },
             ].map((filter) => (
-              <div key={filter.key} className="relative group">
+              <div key={filter.key} className="relative group flex-1">
                 <select
                   value={filter.value}
                   onChange={(e) =>
@@ -225,7 +225,7 @@ const AuthMapView = () => {
                           : e.target.value,
                     }))
                   }
-                  className="appearance-none pl-3 pr-8 py-2 text-[11px] font-bold tracking-wide bg-slate-800/50 hover:bg-slate-700/50 text-white rounded-xl border border-white/5 focus:border-blue-500/50 focus:outline-none transition-all cursor-pointer"
+                 className="appearance-none w-full pl-2 pr-6 py-1.5 text-[10px] font-semibold tracking-wide bg-slate-800/60 text-white rounded-lg border border-white/5 focus:border-blue-500/50 focus:outline-none transition-all cursor-pointer"
                 >
                   <option value="" className="bg-[#111827] text-gray-400">
                     {filter.label}
@@ -259,7 +259,7 @@ const AuthMapView = () => {
             {/* Vertical Divider */}
             <button
               onClick={fetchMapIssues}
-              className="bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-black tracking-widest px-5 py-2.5 rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] hover:shadow-[0_0_25px_rgba(37,99,235,0.6)] active:scale-95 transition-all uppercase cursor-pointer"
+              className="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all uppercase"
             >
               Apply
             </button>
@@ -318,10 +318,14 @@ const AuthMapView = () => {
             ref={popupRef} // ✅ ADD THIS
             className="fixed z-50 w-80 bg-[#111827] rounded-xl border border-white/10 shadow-2xl"
             style={{
-              top: popupPos.top,
-              left: popupPos.left,
-              transform: "translate(16px, -50%)",
-            }}
+  top: window.innerWidth < 640 ? "50%" : popupPos.top,
+  left: window.innerWidth < 640 ? "50%" : popupPos.left,
+  transform:
+    window.innerWidth < 640
+      ? "translate(-50%, -50%)"
+      : "translate(16px, -50%)",
+}}
+
           >
             <div className="p-4 space-y-3 text-gray-200">
               <span className="text-[10px] font-bold px-2 py-1 rounded bg-red-500">
@@ -351,7 +355,7 @@ const AuthMapView = () => {
         {/* ================= LEGEND ================= */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute left-6 bottom-8 z-40"
+          className="absolute left-4 sm:left-6 bottom-28 sm:bottom-8 z-40"
         >
           <div className="bg-[#111827]/90 backdrop-blur-xl p-4 rounded-xl border border-white/10 shadow-lg space-y-2 text-gray-200">
             <p className="text-[10px] font-bold text-gray-400 uppercase">
@@ -366,7 +370,7 @@ const AuthMapView = () => {
         {/* ================= SEARCH ================= */}
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute left-1/2 -translate-x-1/2 bottom-8 w-full max-w-md px-4 z-40"
+          className="absolute left-1/2 -translate-x-1/2 bottom-6 sm:bottom-8 w-full max-w-sm sm:max-w-md px-4 z-40"
         >
           <input
             value={search}

@@ -5,6 +5,7 @@ import { useAuth } from "@clerk/clerk-react";
 import { Search } from "lucide-react";
 import { BookOpen, AlertCircle, ShieldCheck } from "lucide-react";
 import { ArrowRight, Phone, Bot, Ticket } from "lucide-react";
+import { toast } from "sonner";
 
 const AuthoritySupport = () => {
   const [search, setSearch] = useState("");
@@ -17,7 +18,7 @@ const AuthoritySupport = () => {
 
   const submitTicket = async () => {
     if (!ticketTitle || !ticketDesc) {
-      alert("Please fill all fields");
+      toast("All fields are required");
       return;
     }
 
@@ -29,12 +30,12 @@ const AuthoritySupport = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      alert("Support ticket submitted successfully");
+      toast("Support ticket submitted successfully");
       setShowTicketModal(false);
       setTicketTitle("");
       setTicketDesc("");
     } catch (err) {
-      alert("Failed to submit ticket");
+      toast("Failed to submit ticket");
     }
   };
 
@@ -71,9 +72,9 @@ const AuthoritySupport = () => {
 
   return (
     <AuthorityLayout>
-      <main className="flex-1 overflow-y-auto bg-[#0a0f1d] text-slate-300">
+      <main className="flex-1 overflow-y-auto bg-[#0a0f1d] text-slate-300 min-h-screen flex flex-col">
         {/* HEADER SECTION - Upgraded with backdrop blur and accent glow */}
-        <header className="bg-[#111827]/80 backdrop-blur-xl border-b border-white/5 px-10 py-10 relative overflow-hidden">
+        <header className="bg-[#111827]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 lg:px-10 py-8 sm:py-10 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full -mr-20 -mt-20" />
 
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
@@ -87,7 +88,7 @@ const AuthoritySupport = () => {
               </p>
             </div>
 
-            <div className="relative w-full max-w-sm">
+            <div className="relative w-full sm:max-w-sm">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center">
                 <Search className="w-4 h-4 text-slate-500 group-focus-within:text-blue-500 transition-colors duration-300" />
               </div>
@@ -102,8 +103,8 @@ const AuthoritySupport = () => {
         </header>
 
         {/* CONTENT AREA */}
-        <div className="p-10 max-w-6xl mx-auto w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="px-4 sm:px-6 lg:px-10 py-8 sm:py-10 max-w-6xl mx-auto w-full flex-1">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
             {/* LEFT COLUMN: Support Channels */}
             <div className="lg:col-span-8 space-y-4">
               <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">
@@ -182,7 +183,7 @@ const AuthoritySupport = () => {
                   </p>
 
                   <button
-                    onClick={() => alert("AI Assistant will be enabled soon")}
+                    onClick={() => toast("AI Assistant will be enabled soon")}
                     className="w-full bg-[#1e293b] hover:bg-[#334155] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors border border-white/5"
                   >
                     <Bot size={20} className="text-primary" />
@@ -245,8 +246,8 @@ const AuthoritySupport = () => {
           </div>
         </div>
         {/* FOOTER - Placed inside main, but at the bottom */}
-        <footer className="mt-auto pt-12 pb-8 border-t border-white/5 px-10">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <footer className="mt-auto pt-10 pb-8 border-t border-white/5 px-4 sm:px-6 lg:px-10">
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
             {/* BRANDING */}
             <div className="flex items-center gap-3 group cursor-pointer">
               <div className="h-7 w-7 rounded-lg bg-blue-600 flex items-center justify-center text-[11px] font-black text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] group-hover:scale-110 transition-transform">
@@ -264,7 +265,7 @@ const AuthoritySupport = () => {
             </p>
 
             {/* LINKS */}
-            <div className="flex gap-8">
+            <div className="flex flex-wrap justify-center md:justify-start gap-6 sm:gap-8">
               <button className="text-[10px] text-slate-500 hover:text-blue-400 transition-all uppercase font-black tracking-widest">
                 Privacy Protocol
               </button>
@@ -278,7 +279,7 @@ const AuthoritySupport = () => {
 
       {/* MODAL - Enhanced with Backdrop Blur and Dark Accents */}
       {showTicketModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-6">
           <div className="bg-[#111827] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
             <div className="p-6 border-b border-white/5">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -327,7 +328,7 @@ const AuthoritySupport = () => {
 /* ---------- UI COMPONENTS ---------- */
 
 const SupportCard = ({ icon: Icon, title, desc, children }) => (
-  <div className="bg-[#111827] border border-white/5 rounded-2xl p-6 flex gap-6 hover:border-blue-500/30 transition-all shadow-lg group">
+  <div className="bg-[#111827] border border-white/5 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-6 hover:border-blue-500/30 transition-all shadow-lg group">
     <div className="w-14 h-14 flex items-center justify-center bg-[#0d1424] rounded-xl border border-white/5 shrink-0 group-hover:bg-blue-500/10 transition-colors">
       {/* Render the component directly */}
       <Icon className="text-blue-500 w-7 h-7 group-hover:scale-110 transition-transform" />
@@ -335,7 +336,7 @@ const SupportCard = ({ icon: Icon, title, desc, children }) => (
     <div className="flex-1">
       <h4 className="font-bold text-white text-lg mb-1">{title}</h4>
       <p className="text-sm text-slate-500 mb-5 leading-relaxed">{desc}</p>
-      <div className="flex gap-5 items-center">{children}</div>
+      <div className="flex flex-wrap gap-4 items-center">{children}</div>
     </div>
   </div>
 );

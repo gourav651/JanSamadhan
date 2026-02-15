@@ -139,11 +139,11 @@ const AuthIssueDetails = () => {
   return (
     <AuthorityLayout>
       <div className="flex flex-col min-h-screen bg-[#fafafa]">
-        <main className="flex-1 max-w-7xl mx-auto px-6 py-10 w-full">
+        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 w-full">
           {/* HEADER */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-10 gap-4">
             <div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
                 Case Management
               </h1>
               <p className="text-slate-500 mt-1 flex items-center gap-2">
@@ -163,14 +163,14 @@ const AuthIssueDetails = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
             {/* LEFT COLUMN */}
             <div className="xl:col-span-8 space-y-8">
               {issue.images?.[0] && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="group relative w-full h-112.5 rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
+                  className="group relative w-full h-64 sm:h-80 md:h-96 lg:h-112.5 rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
                 >
                   <img
                     src={issue.images[0]}
@@ -229,7 +229,7 @@ const AuthIssueDetails = () => {
                       ({issue.images.length} images)
                     </span>
                   </h3>
-                  <div className="grid grid-cols-3 gap-6">
+                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
                     {(showAllImages
                       ? issue.images
                       : issue.images.slice(1, 4)
@@ -281,7 +281,7 @@ const AuthIssueDetails = () => {
                     Fullscreen
                   </button>
                 </div>
-                <div className="h-56 relative group">
+                <div className="h-48 sm:h-56 relative group">
                   <iframe
                     title="map-preview"
                     className="w-full h-full grayscale-20 contrast-[1.1]"
@@ -301,7 +301,7 @@ const AuthIssueDetails = () => {
                 </div>
               </div>
 
-              <div className="bg-slate-900 rounded-4xl p-8 shadow-2xl space-y-6 relative overflow-hidden">
+             <div className="bg-slate-900 rounded-3xl sm:rounded-4xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl"></div>
                 <div className="relative">
                   <h3 className="text-2xl font-black text-white mb-2">
@@ -412,8 +412,8 @@ const AuthIssueDetails = () => {
 
         {/* LIGHT THEME FOOTER */}
         <footer className="mt-auto py-4 border-t border-slate-200 bg-white">
-          <div className="max-w-7xl mx-auto px-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-6 md:gap-8">
               <div className="flex items-center gap-3 group cursor-pointer">
                 <div className="h-9 w-9 rounded-xl bg-slate-900 flex items-center justify-center text-[12px] font-black text-white shadow-lg group-hover:bg-primary transition-all">
                   J
@@ -457,7 +457,7 @@ const AuthIssueDetails = () => {
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
-              className="bg-white w-full max-w-5xl rounded-[2.5rem] overflow-hidden relative shadow-2xl"
+              className="bg-white w-full max-w-5xl rounded-2xl sm:rounded-[2.5rem] overflow-hidden relative shadow-2xl"
             >
               <button
                 onClick={() => setShowMap(false)}
@@ -465,7 +465,7 @@ const AuthIssueDetails = () => {
               >
                 <X size={24} />
               </button>
-              <div className="h-[75vh]">
+              <div className="h-[65vh] sm:h-[75vh]">
                 <iframe
                   title="map-full"
                   className="w-full h-full"

@@ -20,6 +20,19 @@ const AuthorityLayout = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [showLogout, setShowLogout] = useState(false);
   const accountRef = useRef(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (isSidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isSidebarOpen]);
 
   useEffect(() => {
     socket.on("notification", (data) => {
@@ -46,8 +59,70 @@ const AuthorityLayout = ({ children }) => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
+      {/* ================= MOBILE TOP BAR ================= */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-40">
+        <button onClick={() => setIsSidebarOpen(true)}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-slate-800"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="text-indigo-600 size-5" />
+          <span className="font-bold text-slate-900">
+            Jan<span className="text-indigo-600">Samadhan</span>
+          </span>
+        </div>
+      </div>
+
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* ================= SIDEBAR ================= */}
-      <aside className="w-72 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-sm">
+      <aside
+        className={`
+    fixed lg:static top-0 left-0 h-full w-72 bg-white border-r border-slate-200
+    flex flex-col shrink-0 shadow-lg z-50
+    transform transition-transform duration-300 ease-in-out
+    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+    lg:translate-x-0
+  `}
+      >
+        {/* Mobile Close Button */}
+        <div className="lg:hidden flex justify-end p-4">
+          <button onClick={() => setIsSidebarOpen(false)}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-slate-800"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
         {/* Logo Section */}
         <div className="h-20 flex items-center px-6 border-b border-slate-50">
           <div className="flex items-center gap-3">
@@ -71,16 +146,19 @@ const AuthorityLayout = ({ children }) => {
                 to="/authority/assigned-issues"
                 icon={<ClipboardList size={20} />}
                 label="Assigned Issues"
+                closeSidebar={() => setIsSidebarOpen(false)}
               />
               <SidebarLink
                 to="/authority/dashboard"
                 icon={<LayoutDashboard size={20} />}
                 label="Dashboard"
+                closeSidebar={() => setIsSidebarOpen(false)}
               />
               <SidebarLink
                 to="/authority/map"
                 icon={<MapIcon size={20} />}
                 label="Map View"
+                closeSidebar={() => setIsSidebarOpen(false)}
               />
             </nav>
           </div>
@@ -94,11 +172,13 @@ const AuthorityLayout = ({ children }) => {
                 to="/authority/settings"
                 icon={<Settings size={20} />}
                 label="Settings"
+                closeSidebar={() => setIsSidebarOpen(false)}
               />
               <SidebarLink
                 to="/authority/support"
                 icon={<LifeBuoy size={20} />}
                 label="Support"
+                closeSidebar={() => setIsSidebarOpen(false)}
               />
             </nav>
           </div>
@@ -160,16 +240,19 @@ const AuthorityLayout = ({ children }) => {
       </aside>
 
       {/* ================= PAGE CONTENT ================= */}
-      <main className="flex-1 overflow-y-auto bg-slate-50">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-slate-50 pt-16 lg:pt-0">
+        {children}
+      </main>
     </div>
   );
 };
 
 /* ================= SIDEBAR LINK COMPONENT ================= */
-const SidebarLink = ({ to, icon, label }) => {
+const SidebarLink = ({ to, icon, label, closeSidebar }) => {
   return (
     <NavLink
       to={to}
+      onClick={() => closeSidebar?.()}
       className={({ isActive }) =>
         `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group
         ${

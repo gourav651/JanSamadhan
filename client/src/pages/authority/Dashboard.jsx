@@ -83,7 +83,7 @@ const AuthDashboard = () => {
     <AuthorityLayout>
       <div className="flex-1 overflow-y-auto bg-[#0B0F1A] text-slate-200">
         {/* HEADER */}
-        <header className="border-b border-slate-800 bg-[#0F172A]/50 backdrop-blur-md px-8 py-6 sticky top-0 z-30">
+        <header className="border-b border-slate-800 bg-[#0F172A]/50 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-5 sm:py-6 sticky top-0 z-30">
           <div className="flex items-center justify-between w-full">
             <div>
               <h2 className="text-2xl font-bold text-white tracking-tight">
@@ -165,9 +165,9 @@ const AuthDashboard = () => {
         </header>
 
         {/* CONTENT */}
-        <div className="p-8 space-y-8">
+        <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
           {/* STATS GRID */}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <StatCard
               title="Open Issues"
               value={stats?.open || 0}
@@ -239,7 +239,6 @@ const AuthDashboard = () => {
                 View All
               </button>
             </div>
-
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -280,8 +279,8 @@ const AuthDashboard = () => {
         </div>
 
         {/* FOOTER */}
-        <footer className="mt-auto px-8 py-8 border-t border-slate-800/50">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <footer className="mt-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 border-t border-slate-800/50">
+          <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-4">
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 rounded bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white">
                 J
@@ -337,7 +336,7 @@ const StatCard = ({ title, value, icon, color, trend }) => {
 };
 
 const TableHead = ({ children }) => (
-  <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+  <th className="px-4 sm:px-6 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black uppercase text-slate-500 tracking-widest whitespace-nowrap">
     {children}
   </th>
 );
@@ -355,7 +354,7 @@ const RecentRow = ({ issue, onClick }) => {
       onClick={onClick}
       className="hover:bg-slate-800/40 transition-all cursor-pointer group"
     >
-      <td className="px-6 py-4">
+      <td className="px-4 sm:px-6 py-3 sm:py-4">
         <p className="font-bold text-slate-200 group-hover:text-blue-400 transition-colors">
           {issue.title}
         </p>
@@ -363,12 +362,12 @@ const RecentRow = ({ issue, onClick }) => {
           ID: {issue._id.slice(-6)}
         </p>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-4 sm:px-6 py-3 sm:py-4">
         <span className="text-xs font-medium text-slate-400 bg-slate-800 px-2 py-1 rounded border border-slate-700">
           {issue.category}
         </span>
       </td>
-      <td className="px-6 py-4">
+      <td className="px-4 sm:px-6 py-3 sm:py-4">
         <span
           className={`px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-tighter ${statusStyles[issue.status] || statusStyles.REPORTED}`}
         >
