@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { clerkMiddleware } from "@clerk/express"; // 👈 ADD THIS
 
 import issueRoutes from "./routes/issue.routes.js";
 import authorityRoutes from "./routes/authority.routes.js";
@@ -12,15 +13,15 @@ const app = express();
 
 app.use(
   cors({
-    origin: [process.env.CLIENT_URL],
+    origin: process.env.CLIENT_URL,
     credentials: true,
-  }),
+  })
 );
 
-// 🔥 REQUIRED for multer text fields
-app.use(express.urlencoded({ extended: true }));
+// 🔥 VERY IMPORTANT — MUST COME BEFORE ROUTES
+app.use(clerkMiddleware());
 
-// JSON for non-multipart routes
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Routes
@@ -31,10 +32,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/support", supportRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// 🔥 GLOBAL ERROR HANDLER
+// Global Error
 app.use((err, req, res, next) => {
   console.error("🔥 GLOBAL ERROR:", err);
-
   res.status(500).json({
     success: false,
     message: err.message || "Internal Server Error",
