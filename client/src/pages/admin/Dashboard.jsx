@@ -352,56 +352,65 @@ ring-1 ring-white/5
         </div>
 
         {/* RECENT REPORTS TABLE */}
-        <div className="rounded-2xl border border-slate-800 bg-[#1e293b]/20 overflow-hidden shadow-2xl">
-          <div className="px-6 py-5 border-b border-slate-800 flex justify-between items-center bg-slate-800/20">
+        <div className="rounded-2xl border border-slate-800 bg-[#1e293b]/20 w-full shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="px-4 sm:px-6 py-5 border-b border-slate-800 bg-slate-800/20">
             <h3 className="font-bold text-lg text-white">Recent Reports</h3>
           </div>
-          <table className="w-full">
-            <thead className="text-slate-500 bg-slate-900/50 text-[11px] uppercase tracking-widest font-bold">
-              <tr>
-                {["ID", "Issue", "Location", "Date", "Status"].map((h) => (
-                  <th key={h} className="px-6 py-4 text-left">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
 
-            <tbody className="divide-y divide-slate-800/50">
-              {dashboardData?.recentIssues?.length === 0 && (
+          {/* Scroll Wrapper */}
+          <div className="w-full overflow-x-auto">
+            <table className="min-w-225 w-full text-left border-collapse">
+              <thead className="text-slate-500 bg-slate-900/50 text-[11px] uppercase tracking-widest font-bold">
                 <tr>
-                  <td colSpan="6" className="p-4 text-center text-[#9ca8ba]">
-                    No recent issues found
-                  </td>
+                  {["ID", "Issue", "Location", "Date", "Status"].map((h) => (
+                    <th key={h} className="px-6 py-4 whitespace-nowrap">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              )}
+              </thead>
 
-              {dashboardData?.recentIssues?.map((issue) => (
-                <tr
-                  key={issue._id}
-                  className="hover:bg-slate-800/30 transition-colors"
-                >
-                  <td className="px-6 py-4 font-mono text-blue-400 text-xs tracking-tighter">
-                    #{issue._id.slice(-6).toUpperCase()}
-                  </td>
-                  <td className="px-6 py-4 font-medium text-slate-200">
-                    {issue.title}
-                  </td>
-                  <td className="px-6 py-4 text-slate-400 text-xs">
-                    {issue.location?.address}
-                  </td>
-                  <td className="px-6 py-4 text-slate-500 text-xs">
-                    {new Date(issue.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 text-[10px] font-bold border border-rose-500/20">
-                      {issue.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              <tbody className="divide-y divide-slate-800/50">
+                {dashboardData?.recentIssues?.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="p-6 text-center text-[#9ca8ba]">
+                      No recent issues found
+                    </td>
+                  </tr>
+                )}
+
+                {dashboardData?.recentIssues?.map((issue) => (
+                  <tr
+                    key={issue._id}
+                    className="hover:bg-slate-800/30 transition-colors"
+                  >
+                    <td className="px-6 py-4 font-mono text-blue-400 text-xs tracking-tighter whitespace-nowrap">
+                      #{issue._id.slice(-6).toUpperCase()}
+                    </td>
+
+                    <td className="px-6 py-4 font-medium text-slate-200 whitespace-nowrap">
+                      {issue.title}
+                    </td>
+
+                    <td className="px-6 py-4 text-slate-400 text-xs whitespace-nowrap">
+                      {issue.location?.address}
+                    </td>
+
+                    <td className="px-6 py-4 text-slate-500 text-xs whitespace-nowrap">
+                      {new Date(issue.createdAt).toLocaleDateString()}
+                    </td>
+
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 text-[10px] font-bold border border-rose-500/20">
+                        {issue.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <footer className="text-xs text-center text-[#9ca8ba] pt-4">
