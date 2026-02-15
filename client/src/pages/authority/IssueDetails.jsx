@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
-import axios from "axios";
+import axios from "../../lib/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -41,11 +41,7 @@ const AuthIssueDetails = () => {
   useEffect(() => {
     const fetchIssue = async () => {
       try {
-        const token = await getToken();
-        const res = await axios.get(
-          `http://localhost:5000/api/authority/issues/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
+        const res = await axios.get(`/api/authority/issues/${id}`);
 
         setIssue(res.data.issue);
         setStatus(res.data.issue.status);
@@ -71,17 +67,12 @@ const AuthIssueDetails = () => {
     if (isResolved) return;
     try {
       setSaving(true);
-      const token = await getToken();
       const formData = new FormData();
       formData.append("status", status);
       formData.append("resolutionNotes", notes);
       files.forEach((f) => formData.append("resolutionImages", f));
 
-      await axios.patch(
-        `http://localhost:5000/api/authority/issues/${id}/status`,
-        formData,
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
+      await axios.patch(`/api/authority/issues/${id}/status`, formData);
 
       setIssue((prev) => ({
         ...prev,
@@ -229,7 +220,7 @@ const AuthIssueDetails = () => {
                       ({issue.images.length} images)
                     </span>
                   </h3>
-                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
                     {(showAllImages
                       ? issue.images
                       : issue.images.slice(1, 4)
@@ -301,7 +292,7 @@ const AuthIssueDetails = () => {
                 </div>
               </div>
 
-             <div className="bg-slate-900 rounded-3xl sm:rounded-4xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
+              <div className="bg-slate-900 rounded-3xl sm:rounded-4xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl"></div>
                 <div className="relative">
                   <h3 className="text-2xl font-black text-white mb-2">
@@ -412,7 +403,7 @@ const AuthIssueDetails = () => {
 
         {/* LIGHT THEME FOOTER */}
         <footer className="mt-auto py-4 border-t border-slate-200 bg-white">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-6 md:gap-8">
               <div className="flex items-center gap-3 group cursor-pointer">
                 <div className="h-9 w-9 rounded-xl bg-slate-900 flex items-center justify-center text-[12px] font-black text-white shadow-lg group-hover:bg-primary transition-all">

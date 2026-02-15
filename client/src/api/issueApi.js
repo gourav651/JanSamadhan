@@ -1,16 +1,16 @@
 import axios from "../lib/axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
+  withCredentials: true,
 });
 
 export const getNearbyIssues = async ({ lat, lng }) => {
   if (!lat || !lng) return [];
 
-  const res = await axios.get(
-    `/api/issues/nearby?lat=${lat}&lng=${lng}`
+  const res = await API.get(
+    `/issues/nearby?lat=${lat}&lng=${lng}`
   );
 
   return res.data.issues || [];
 };
-

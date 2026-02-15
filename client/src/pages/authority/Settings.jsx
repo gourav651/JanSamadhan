@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { SignOutButton, useAuth, useUser } from "@clerk/clerk-react";
+import { SignOutButton, useUser } from "@clerk/clerk-react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios from "../../lib/axios";
 import {
   User,
   ShieldCheck,
@@ -16,7 +16,6 @@ import {
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 
 const AuthSettings = () => {
-  const { getToken } = useAuth();
   const { user } = useUser();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
@@ -24,13 +23,8 @@ const AuthSettings = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const token = await getToken();
-        const res = await axios.get(
-          "http://localhost:5000/api/authority/settings",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const res = await axios.get("/api/authority/settings");
+
         setProfile(res.data.data);
       } catch (err) {
         console.error("Settings load error", err);
@@ -39,7 +33,7 @@ const AuthSettings = () => {
       }
     };
     loadSettings();
-  }, [getToken]);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },

@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/clerk-react";
 import { motion, AnimatePresence } from "framer-motion"; // For smooth animations
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 import IssueCard from "../../components/authority/IssueCard";
-import axios from "axios";
+import axios from "../../lib/axios"; 
 import { ChevronDown } from "lucide-react";
 
 const AuthAssignedIssues = () => {
@@ -20,22 +20,23 @@ const AuthAssignedIssues = () => {
 
   const fetchAssignedIssues = async () => {
     try {
-      setLoading(true);
-      const token = await getToken();
-      const res = await axios.get(
-        "http://localhost:5000/api/authority/issues/assigned",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { status, category, priority, page, limit: 5 },
-        },
-      );
-      setIssues(res.data.issues);
-      setTotalPages(res.data.pagination.totalPages);
-    } catch (err) {
-      console.error("Failed to fetch assigned issues", err);
-    } finally {
-      setLoading(false);
+  setLoading(true);
+
+  const res = await axios.get(
+    "/api/authority/issues/assigned",
+    {
+      params: { status, category, priority, page, limit: 5 },
     }
+  );
+
+  setIssues(res.data.issues);
+  setTotalPages(res.data.pagination.totalPages);
+
+} catch (err) {
+  console.error("Failed to fetch assigned issues", err);
+} finally {
+  setLoading(false);
+}
   };
 
   useEffect(() => {

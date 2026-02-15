@@ -1,7 +1,6 @@
 import AuthorityLayout from "../../components/authority/AuthorityLayout";
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
-import { useAuth } from "@clerk/clerk-react";
+import axios from "../../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { markerIcon } from "@/utils/leafletIcon";
@@ -14,7 +13,6 @@ const STATUS_STYLES = {
 };
 
 const AuthMapView = () => {
-  const { getToken } = useAuth();
   const popupRef = useRef(null);
 
   const navigate = useNavigate();
@@ -58,16 +56,12 @@ const AuthMapView = () => {
         setLoading(true);
         const token = await getToken();
 
-        const res = await axios.get(
-          "http://localhost:5000/api/authority/issues/map",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            params: {
-              lat: mapCenter[0],
-              lng: mapCenter[1],
-            },
+        const res = await axios.get("/api/authority/issues/map", {
+          params: {
+            lat: mapCenter[0],
+            lng: mapCenter[1],
           },
-        );
+        });
 
         setAllIssues(res.data.issues);
         setIssues(res.data.issues); // ✅ show all initially
@@ -101,19 +95,13 @@ const AuthMapView = () => {
   const fetchMapIssues = async () => {
     try {
       setLoading(true);
-      const token = await getToken();
-
-      const res = await axios.get(
-        "http://localhost:5000/api/authority/issues/map",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            ...filters,
-            lat: mapCenter[0],
-            lng: mapCenter[1],
-          },
+      const res = await axios.get("/api/authority/issues/map", {
+        params: {
+          ...filters,
+          lat: mapCenter[0],
+          lng: mapCenter[1],
         },
-      );
+      });
 
       setAllIssues(res.data.issues); // 🔑 update search base
       setIssues(res.data.issues);
@@ -225,7 +213,7 @@ const AuthMapView = () => {
                           : e.target.value,
                     }))
                   }
-                 className="appearance-none w-full pl-2 pr-6 py-1.5 text-[10px] font-semibold tracking-wide bg-slate-800/60 text-white rounded-lg border border-white/5 focus:border-blue-500/50 focus:outline-none transition-all cursor-pointer"
+                  className="appearance-none w-full pl-2 pr-6 py-1.5 text-[10px] font-semibold tracking-wide bg-slate-800/60 text-white rounded-lg border border-white/5 focus:border-blue-500/50 focus:outline-none transition-all cursor-pointer"
                 >
                   <option value="" className="bg-[#111827] text-gray-400">
                     {filter.label}
@@ -318,14 +306,13 @@ const AuthMapView = () => {
             ref={popupRef} // ✅ ADD THIS
             className="fixed z-50 w-80 bg-[#111827] rounded-xl border border-white/10 shadow-2xl"
             style={{
-  top: window.innerWidth < 640 ? "50%" : popupPos.top,
-  left: window.innerWidth < 640 ? "50%" : popupPos.left,
-  transform:
-    window.innerWidth < 640
-      ? "translate(-50%, -50%)"
-      : "translate(16px, -50%)",
-}}
-
+              top: window.innerWidth < 640 ? "50%" : popupPos.top,
+              left: window.innerWidth < 640 ? "50%" : popupPos.left,
+              transform:
+                window.innerWidth < 640
+                  ? "translate(-50%, -50%)"
+                  : "translate(16px, -50%)",
+            }}
           >
             <div className="p-4 space-y-3 text-gray-200">
               <span className="text-[10px] font-bold px-2 py-1 rounded bg-red-500">
