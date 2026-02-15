@@ -6,13 +6,19 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(async (config) => {
-  if (window.Clerk) {
-    const token = await window.Clerk.session?.getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  try {
+    if (window.Clerk?.session) {
+      const token = await window.Clerk.session.getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
+  } catch (error) {
+    console.error("Token attach error:", error);
   }
+
   return config;
 });
+
 
 export default instance;
